@@ -27,7 +27,7 @@
 //! # */
 //! ```
 //!
-//! To place child entities inside the frame, add [`RectrayBundle`] next to things
+//! To place descendant entities inside the frame, add [`RectrayBundle`] next to entities
 //! with [`TransformBundle`](bevy_transform::prelude::TransformBundle)s.
 //!
 //!
@@ -43,6 +43,10 @@
 //! )
 //! # */
 //! ```
+//! 
+//! Since we only operate on `Transform`, `bevy_rectray`
+//! works in `Transform - Transform2d - Transform` sandwich situations.
+//! 
 //!
 //! # Integration
 //!
