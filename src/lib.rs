@@ -1,6 +1,6 @@
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::type_complexity)]
-//! A plug and use 2d layout system (that works in 3d!) for bevy.
+//! A minimal use 2d layout system (that works in 3d!) for bevy.
 //!
 //! # Getting Started
 //!
