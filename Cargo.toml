@@ -3,6 +3,17 @@ name = "bevy_rectray"
 version = "0.1.0"
 edition = "2021"
 
+authors = ["Mincong Lu <mintlux667@gmail.com>"]
+license = "MIT OR Apache-2.0"
+
+readme = "README.md"
+repository = "https://github.com/mintlu8/bevy_rectray"
+description = """
+A minimal 2d layout system for bevy.
+"""
+keywords = ["bevy", "layout", "ui"]
+
+
 [dependencies]
 bevy_app = "0.14.0"
 bevy_ecs = "0.14.0"
