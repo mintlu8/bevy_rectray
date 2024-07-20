@@ -1,0 +1,19 @@
+[package]
+name = "bevy_rectray"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy_app = "0.14.0"
+bevy_ecs = "0.14.0"
+bevy_hierarchy = "0.14.0"
+bevy_math = "0.14.0"
+bevy_reflect = "0.14.0"
+bevy_transform = "0.14.0"
+downcast-rs = "1.2.1"
+itertools = "0.13.0"
+serde = { version = "1.0.204", features = ["derive"] }
+
+[dev-dependencies]
+bevy = "0.14.0"
+fastrand = "2.1.0"
