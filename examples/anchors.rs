@@ -35,7 +35,7 @@ pub fn init(mut commands: Commands) {
         .spawn((
             SpriteBundle {
                 sprite: Sprite {
-                    color: Color::linear_rgb(0.5, 0.5, 0.5),
+                    color: Color::BLACK,
                     custom_size: Some(Vec2::new(500., 500.)),
                     ..Default::default()
                 },

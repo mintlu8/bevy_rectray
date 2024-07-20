@@ -81,6 +81,20 @@ the outputted `RotatedRect::dimension`.
 Add `RectrayContainerBundle` to put child items in a `Layout`.
 See module level documentation for details.
 
+## Showcase
+
+* Place items on anchors of parents
+
+![anchors](./showcase/anchors.png)
+
+* Put 3d meshes in a layout
+
+![3d](./showcase/3d.png)
+
+* Place individual words to form a paragraph
+
+![text](./showcase/text.png)
+
 ## Versions
 
 | bevy | bevy_rectray |
