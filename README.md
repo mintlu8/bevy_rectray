@@ -1,6 +1,6 @@
 # bevy_rectray
 
-A plug and use 2d layout system (that works in 3d!) for bevy.
+A minimal 2d layout system (that works in 3d!) for bevy.
 
 [![Crates.io](https://img.shields.io/crates/v/bevy_rectray.svg)](https://crates.io/crates/bevy_rectray)
 [![Docs](https://docs.rs/bevy_rectray/badge.svg)](https://docs.rs/bevy_rectray/latest/bevy_rectray/)
@@ -44,7 +44,7 @@ commands.spawn(
 ## Integration
 
 `bevy_rectray` is minimal and does not magically react to changes in bevy components.
-We take in `Transform2D` and `Dimension` and produces `Transform`(bevy_transform::prelude::Transform)
+We take in `Transform2D` and `Dimension` and produces `Transform`
 and `RotatedRect`.
 
 Some of those data can come from external sources.
