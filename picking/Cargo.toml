@@ -1,8 +1,5 @@
-[workspace]
-members = ["picking"]
-
 [package]
-name = "bevy_rectray"
+name = "bevy_rectray_picking"
 version = "0.1.0"
 edition = "2021"
 
@@ -12,22 +9,22 @@ license = "MIT OR Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/mintlu8/bevy_rectray"
 description = """
-A minimal 2d layout system for bevy.
+bevy_mod_picking backend for bevy_rectray.
 """
 keywords = ["bevy", "layout", "ui"]
 
-
 [dependencies]
-bevy_app = "0.14.0"
+bevy_mod_picking = { version = "0.20.1", default-features = false }
 bevy_ecs = "0.14.0"
-bevy_hierarchy = "0.14.0"
-bevy_math = "0.14.0"
-bevy_reflect = "0.14.0"
 bevy_transform = "0.14.0"
-downcast-rs = "1.2.1"
-serde = { version = "1.0.204", features = ["derive"] }
+bevy_math = "0.14.0"
+bevy_hierarchy = "0.14.0"
+bevy_render = "0.14.0"
+bevy_app = "0.14.0"
+bevy_rectray = { version = "0.1.0", path = "../"}
 
 [dev-dependencies]
+bevy_mod_picking = "0.20.1"
 bevy = "0.14.0"
-fastrand = "2.1.0"
 itertools = "0.13.0"
+fastrand = "2.1.0"
