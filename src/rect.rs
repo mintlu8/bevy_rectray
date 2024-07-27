@@ -1,4 +1,4 @@
-use std::ops::Mul;
+use std::ops::{Mul, Neg};
 
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 use bevy_math::{Quat, Rect, Vec2};
@@ -76,6 +76,14 @@ impl Anchor {
             (_, y) if y > 0.16 => "TopCenter",
             _ => "Center",
         }
+    }
+}
+
+impl Neg for Anchor {
+    type Output = Anchor;
+
+    fn neg(self) -> Self::Output {
+        Self(-self.0)
     }
 }
 
@@ -169,7 +177,7 @@ impl RotatedRect {
 
     pub fn transform_at(&self, center: Vec2) -> Transform {
         Transform {
-            translation: self.anchor(center.into()).extend(self.z),
+            translation: self.anchor((-center).into()).extend(self.z),
             rotation: Quat::from_rotation_z(self.rotation),
             scale: self.scale.extend(1.0),
         }
@@ -179,7 +187,7 @@ impl RotatedRect {
     #[inline]
     pub fn construct(parent: &ParentInfo, transform: &Transform2D, dimension: Vec2) -> Self {
         let parent_anchor = parent.anchor.unwrap_or(transform.get_parent_anchor());
-        let root = parent.dimension * (parent_anchor - parent.at);
+        let root = parent.dimension * parent_anchor;
         // apply offset and dimension
         let self_center = root
             + transform.offset

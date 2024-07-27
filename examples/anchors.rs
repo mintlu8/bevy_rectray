@@ -78,6 +78,7 @@ fn build_one(builder: &mut ChildBuilder, color: Color, anchor: Anchor) {
             RectrayBundle {
                 transform_2d: Transform2D {
                     anchor,
+                    center: anchor,
                     ..Default::default()
                 },
                 dimension: Dimension(Vec2::new(100., 50.)),
@@ -102,7 +103,7 @@ fn build_two(builder: &mut ChildBuilder, color: Color, anchor: Anchor) {
         SpriteBundle {
             sprite: Sprite {
                 color,
-                custom_size: Some(Vec2::new(10., 10.)),
+                custom_size: Some(Vec2::new(15., 10.)),
                 ..Default::default()
             },
             ..Default::default()
@@ -110,9 +111,10 @@ fn build_two(builder: &mut ChildBuilder, color: Color, anchor: Anchor) {
         RectrayBundle {
             transform_2d: Transform2D {
                 anchor,
+                center: anchor,
                 ..Default::default()
             },
-            dimension: Dimension(Vec2::new(10., 10.)),
+            dimension: Dimension(Vec2::new(15., 10.)),
             ..Default::default()
         },
     ));
