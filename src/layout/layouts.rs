@@ -2,10 +2,10 @@ use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::ops::Deref;
 
-use bevy_ecs::entity::Entity;
-use bevy_math::Vec2;
-use bevy_reflect::std_traits::ReflectDefault;
-use bevy_reflect::Reflect;
+use bevy::ecs::entity::Entity;
+use bevy::math::Vec2;
+use bevy::reflect::std_traits::ReflectDefault;
+use bevy::reflect::Reflect;
 use downcast_rs::{impl_downcast, Downcast};
 
 use super::{util::*, LayoutInfo, LayoutRange};

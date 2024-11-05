@@ -27,8 +27,8 @@ commands.spawn(
 )
 ```
 
-To place descendant entities inside the frame, add `RectrayBundle` next to entities
-with `TransformBundles`.
+To place descendant entities inside the frame, add [`Transform2D`] and [`Dimension`] next to entities
+with `Transform`s.
 
 ```rust
 commands.spawn(

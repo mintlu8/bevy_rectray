@@ -1,9 +1,9 @@
 use std::fmt::Debug;
 use std::marker::PhantomData;
 
-use bevy_ecs::entity::Entity;
-use bevy_math::Vec2;
-use bevy_reflect::Reflect;
+use bevy::ecs::entity::Entity;
+use bevy::math::Vec2;
+use bevy::reflect::Reflect;
 
 use crate::layout::LayoutControl;
 
@@ -26,15 +26,15 @@ pub trait Direction: Sized + Debug + Send + Sync + 'static {
 pub trait DirectionPair {}
 
 /// The direction +X, left to right.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Reflect)]
 pub enum X {}
 
 /// The direction +Y, bottom to top.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Reflect)]
 pub enum Y {}
 
 /// Reverse a direction.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Reflect)]
 pub enum Rev<T> {
     _Phantom(PhantomData<T>, X),
 }

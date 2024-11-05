@@ -1,11 +1,20 @@
 use std::collections::HashSet;
 
+use bevy::app::PluginGroup;
+use bevy::app::{App, Startup};
+use bevy::ecs::system::{Commands, ResMut};
+use bevy::hierarchy::BuildChildren;
+use bevy::math::{
+    primitives::{Cuboid, Cylinder, Plane3d, Sphere, Torus},
+    Vec2, Vec3,
+};
+use bevy::transform::components::Transform;
 use bevy::{
     asset::Assets,
     color::Color,
     diagnostic::FrameTimeDiagnosticsPlugin,
-    pbr::{AmbientLight, DirectionalLight, DirectionalLightBundle, PbrBundle, StandardMaterial},
-    prelude::{Camera3dBundle, SpatialBundle},
+    pbr::{AmbientLight, DirectionalLight, MeshMaterial3d, StandardMaterial},
+    prelude::{Camera3d, ChildBuild, Mesh3d},
     render::{
         mesh::{Mesh, Meshable},
         render_asset::RenderAssetUsages,
@@ -15,20 +24,10 @@ use bevy::{
     window::{Window, WindowPlugin},
     DefaultPlugins,
 };
-use bevy_app::PluginGroup;
-use bevy_app::{App, Startup};
-use bevy_ecs::system::{Commands, ResMut};
-use bevy_hierarchy::BuildChildren;
-use bevy_math::{
-    primitives::{Cuboid, Cylinder, Plane3d, Sphere, Torus},
-    Vec2, Vec3,
-};
 use bevy_rectray::{
     layout::{Container, LayoutObject, StackLayout},
-    Anchor, Dimension, RectrayBundle, RectrayContainerBundle, RectrayFrame, RectrayPlugin,
-    Transform2D,
+    Anchor, Dimension, RectrayFrame, RectrayPlugin, Transform2D,
 };
-use bevy_transform::components::Transform;
 
 pub fn main() {
     App::new()
@@ -55,20 +54,19 @@ pub fn init(
     mut images: ResMut<Assets<Image>>,
     mut mats: ResMut<Assets<StandardMaterial>>,
 ) {
-    commands.spawn(Camera3dBundle {
-        transform: Transform::from_xyz(20., 20., 20.).looking_at(Vec3::ZERO, Vec3::Z),
-        ..Default::default()
-    });
+    commands.spawn((
+        Camera3d::default(),
+        Transform::from_xyz(20., 20., 20.).looking_at(Vec3::ZERO, Vec3::Z),
+    ));
 
-    commands.spawn(DirectionalLightBundle {
-        directional_light: DirectionalLight {
+    commands.spawn((
+        DirectionalLight {
             color: Color::WHITE,
             illuminance: 8000.,
             ..Default::default()
         },
-        transform: Transform::from_xyz(10., -20., 20.).looking_at(Vec3::ZERO, Vec3::Z),
-        ..Default::default()
-    });
+        Transform::from_xyz(10., -20., 20.).looking_at(Vec3::ZERO, Vec3::Z),
+    ));
 
     let mat = mats.add(StandardMaterial {
         base_color_texture: Some(images.add(uv_debug_texture())),
@@ -77,24 +75,17 @@ pub fn init(
 
     commands
         .spawn((
-            SpatialBundle {
-                transform: Transform::from_xyz(0., 0., 8.),
-                ..Default::default()
-            },
             RectrayFrame::from_anchor_dimension(Anchor::CENTER, Vec2::new(10., 10.)),
+            Transform::from_xyz(0., 0., 8.),
         ))
         .with_children(|builder| {
             builder
                 .spawn((
-                    SpatialBundle::default(),
-                    RectrayContainerBundle {
-                        transform_2d: Transform2D::UNIT,
-                        dimension: Dimension(Vec2::new(10., 10.)),
-                        container: Container {
-                            layout: LayoutObject::new(StackLayout::HSTACK),
-                            margin: Vec2::new(0.1, 0.1),
-                            ..Default::default()
-                        },
+                    Transform2D::UNIT,
+                    Dimension(Vec2::new(10., 10.)),
+                    Container {
+                        layout: LayoutObject::new(StackLayout::HSTACK),
+                        margin: Vec2::new(0.1, 0.1),
                         ..Default::default()
                     },
                 ))
@@ -102,19 +93,13 @@ pub fn init(
                     for i in HashSet::<u32>::from_iter(0u32..10u32) {
                         let pos = Vec2::new(fastrand::f32() * 1.5 + 0.5, 1.);
                         builder.spawn((
-                            PbrBundle {
-                                mesh: meshes.add(random_mesh(i).scaled_by(pos.extend(1.))),
-                                material: mat.clone(),
+                            Mesh3d(meshes.add(random_mesh(i).scaled_by(pos.extend(1.)))),
+                            MeshMaterial3d(mat.clone()),
+                            Transform2D {
+                                anchor: Anchor::CENTER_LEFT,
                                 ..Default::default()
                             },
-                            RectrayBundle {
-                                transform_2d: Transform2D {
-                                    anchor: Anchor::CENTER_LEFT,
-                                    ..Default::default()
-                                },
-                                dimension: Dimension(Vec2::new(2.0, 2.0) * pos),
-                                ..Default::default()
-                            },
+                            Dimension(Vec2::new(2.0, 2.0) * pos),
                         ));
                     }
                 });

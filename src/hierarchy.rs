@@ -1,12 +1,14 @@
-use bevy_ecs::{component::Component, reflect::ReflectComponent};
-use bevy_math::Vec2;
-use bevy_reflect::Reflect;
+use bevy::ecs::{component::Component, reflect::ReflectComponent};
+use bevy::math::Vec2;
+use bevy::prelude::{Transform, Visibility};
+use bevy::reflect::Reflect;
 
 use crate::rect::Anchor;
 
 /// A root node that creates an area to place child entities.
 #[derive(Debug, Default, Reflect, Component)]
 #[reflect(Component)]
+#[require(Transform, Visibility)]
 pub struct RectrayFrame {
     pub dimension: Vec2,
     pub at: Vec2,

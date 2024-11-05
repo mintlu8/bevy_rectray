@@ -1,9 +1,9 @@
 use std::ops::{Mul, Neg};
 
-use bevy_ecs::{component::Component, reflect::ReflectComponent};
-use bevy_math::{Quat, Rect, Vec2};
-use bevy_reflect::{std_traits::ReflectDefault, Reflect, ReflectDeserialize, ReflectSerialize};
-use bevy_transform::components::Transform;
+use bevy::ecs::{component::Component, reflect::ReflectComponent};
+use bevy::math::{Quat, Rect, Vec2};
+use bevy::reflect::{std_traits::ReflectDefault, Reflect, ReflectDeserialize, ReflectSerialize};
+use bevy::transform::components::Transform;
 use serde::{Deserialize, Serialize};
 
 use crate::Transform2D;

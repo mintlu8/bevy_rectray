@@ -1,31 +1,14 @@
 use std::collections::HashSet;
 
 use bevy::{
-    color::Color,
+    asset::RenderAssetUsages,
     diagnostic::FrameTimeDiagnosticsPlugin,
-    prelude::{Camera2dBundle, SpatialBundle},
-    render::{
-        mesh::{Mesh, Meshable},
-        render_asset::RenderAssetUsages,
-        render_resource::{Extent3d, TextureDimension, TextureFormat},
-        texture::Image,
-    },
-    sprite::{Sprite, SpriteBundle},
-    window::{Window, WindowPlugin},
-    DefaultPlugins,
-};
-use bevy_app::PluginGroup;
-use bevy_app::{App, Startup};
-use bevy_ecs::system::Commands;
-use bevy_hierarchy::BuildChildren;
-use bevy_math::{
-    primitives::{Cuboid, Cylinder, Plane3d, Sphere, Torus},
-    Vec2, Vec3,
+    prelude::*,
+    render::render_resource::{Extent3d, TextureDimension, TextureFormat},
 };
 use bevy_rectray::{
     layout::{Container, LayoutObject, SpanLayout, StackLayout},
-    Anchor, Dimension, RectrayBundle, RectrayContainerBundle, RectrayFrame, RectrayPlugin,
-    Transform2D,
+    Anchor, Dimension, RectrayFrame, RectrayPlugin, Transform2D,
 };
 
 pub fn main() {
@@ -56,63 +39,51 @@ static ANCHORS: [Anchor; 9] = [
 ];
 
 pub fn init(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d);
 
     commands
-        .spawn((
-            SpatialBundle::default(),
-            RectrayFrame::from_anchor_dimension(Anchor::CENTER, Vec2::new(10., 10.)),
+        .spawn(RectrayFrame::from_anchor_dimension(
+            Anchor::CENTER,
+            Vec2::new(10., 10.),
         ))
         .with_children(|builder| {
             builder
                 .spawn((
-                    SpatialBundle::default(),
-                    RectrayContainerBundle {
-                        transform_2d: Transform2D::UNIT.with_offset(Vec2::new(0., -20.)),
-                        dimension: Dimension(Vec2::new(250., 25.)),
-                        container: Container {
-                            layout: LayoutObject::new(StackLayout::HSTACK),
-                            margin: Vec2::new(1.0, 1.0),
-                            ..Default::default()
-                        },
+                    Transform2D::UNIT.with_offset(Vec2::new(0., -20.)),
+                    Dimension(Vec2::new(250., 25.)),
+                    Container {
+                        layout: LayoutObject::new(StackLayout::HSTACK),
+                        margin: Vec2::new(1.0, 1.0),
                         ..Default::default()
                     },
+                    Visibility::Inherited,
                 ))
                 .with_children(|builder| {
                     for i in HashSet::<usize>::from_iter(0usize..9usize) {
                         let size = Vec2::new(fastrand::f32() * 25. + 5., 20.);
                         builder.spawn((
-                            SpriteBundle {
-                                sprite: Sprite {
-                                    color: Color::hsl(fastrand::f32() * 360., 0.8, 0.5),
-                                    custom_size: Some(size),
-                                    ..Default::default()
-                                },
+                            Sprite {
+                                color: Color::hsl(fastrand::f32() * 360., 0.8, 0.5),
+                                custom_size: Some(size),
                                 ..Default::default()
                             },
-                            RectrayBundle {
-                                transform_2d: Transform2D {
-                                    anchor: ANCHORS[i],
-                                    ..Default::default()
-                                },
-                                dimension: Dimension(size),
+                            Transform2D {
+                                anchor: ANCHORS[i],
                                 ..Default::default()
                             },
+                            Dimension(size),
                         ));
                     }
                 });
 
             builder
                 .spawn((
-                    SpatialBundle::default(),
-                    RectrayContainerBundle {
-                        transform_2d: Transform2D::UNIT.with_offset(Vec2::new(0., 20.)),
-                        dimension: Dimension(Vec2::new(250., 25.)),
-                        container: Container {
-                            layout: LayoutObject::new(SpanLayout::HBOX),
-                            margin: Vec2::new(1.0, 1.0),
-                            ..Default::default()
-                        },
+                    Sprite::default(),
+                    Transform2D::UNIT.with_offset(Vec2::new(0., 20.)),
+                    Dimension(Vec2::new(250., 25.)),
+                    Container {
+                        layout: LayoutObject::new(SpanLayout::HBOX),
+                        margin: Vec2::new(1.0, 1.0),
                         ..Default::default()
                     },
                 ))
@@ -120,22 +91,16 @@ pub fn init(mut commands: Commands) {
                     for i in HashSet::<usize>::from_iter(0usize..9usize) {
                         let size = Vec2::new(fastrand::f32() * 25. + 5., 20.);
                         builder.spawn((
-                            SpriteBundle {
-                                sprite: Sprite {
-                                    color: Color::hsl(fastrand::f32() * 360., 0.8, 0.5),
-                                    custom_size: Some(size),
-                                    ..Default::default()
-                                },
+                            Sprite {
+                                color: Color::hsl(fastrand::f32() * 360., 0.8, 0.5),
+                                custom_size: Some(size),
                                 ..Default::default()
                             },
-                            RectrayBundle {
-                                transform_2d: Transform2D {
-                                    anchor: ANCHORS[i],
-                                    ..Default::default()
-                                },
-                                dimension: Dimension(size),
+                            Transform2D {
+                                anchor: ANCHORS[i],
                                 ..Default::default()
                             },
+                            Dimension(size),
                         ));
                     }
                 });

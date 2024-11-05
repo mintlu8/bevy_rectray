@@ -1,17 +1,17 @@
+use bevy::app::PluginGroup;
+use bevy::app::{App, Startup};
+use bevy::ecs::system::Commands;
+use bevy::hierarchy::{BuildChildren, ChildBuilder};
+use bevy::math::Vec2;
 use bevy::{
     color::Color,
     diagnostic::FrameTimeDiagnosticsPlugin,
-    prelude::Camera2dBundle,
-    sprite::{Sprite, SpriteBundle},
+    prelude::{Camera2d, ChildBuild},
+    sprite::Sprite,
     window::{Window, WindowPlugin},
     DefaultPlugins,
 };
-use bevy_app::PluginGroup;
-use bevy_app::{App, Startup};
-use bevy_ecs::system::Commands;
-use bevy_hierarchy::{BuildChildren, ChildBuilder};
-use bevy_math::Vec2;
-use bevy_rectray::{Anchor, Dimension, RectrayBundle, RectrayFrame, RectrayPlugin, Transform2D};
+use bevy_rectray::{Anchor, Dimension, RectrayFrame, RectrayPlugin, Transform2D};
 
 pub fn main() {
     App::new()
@@ -29,16 +29,13 @@ pub fn main() {
 }
 
 pub fn init(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d);
 
     commands
         .spawn((
-            SpriteBundle {
-                sprite: Sprite {
-                    color: Color::BLACK,
-                    custom_size: Some(Vec2::new(500., 500.)),
-                    ..Default::default()
-                },
+            Sprite {
+                color: Color::BLACK,
+                custom_size: Some(Vec2::new(500., 500.)),
                 ..Default::default()
             },
             RectrayFrame::from_anchor_dimension(Anchor::CENTER, Vec2::new(500., 500.)),
@@ -67,23 +64,17 @@ pub fn init(mut commands: Commands) {
 fn build_one(builder: &mut ChildBuilder, color: Color, anchor: Anchor) {
     builder
         .spawn((
-            SpriteBundle {
-                sprite: Sprite {
-                    color,
-                    custom_size: Some(Vec2::new(100., 50.)),
-                    ..Default::default()
-                },
+            Sprite {
+                color,
+                custom_size: Some(Vec2::new(100., 50.)),
                 ..Default::default()
             },
-            RectrayBundle {
-                transform_2d: Transform2D {
-                    anchor,
-                    center: anchor,
-                    ..Default::default()
-                },
-                dimension: Dimension(Vec2::new(100., 50.)),
+            Transform2D {
+                anchor,
+                center: anchor,
                 ..Default::default()
             },
+            Dimension(Vec2::new(100., 50.)),
         ))
         .with_children(|builder| {
             build_two(builder, Color::BLACK, Anchor::TOP_LEFT);
@@ -100,22 +91,16 @@ fn build_one(builder: &mut ChildBuilder, color: Color, anchor: Anchor) {
 
 fn build_two(builder: &mut ChildBuilder, color: Color, anchor: Anchor) {
     builder.spawn((
-        SpriteBundle {
-            sprite: Sprite {
-                color,
-                custom_size: Some(Vec2::new(15., 10.)),
-                ..Default::default()
-            },
+        Sprite {
+            color,
+            custom_size: Some(Vec2::new(15., 10.)),
             ..Default::default()
         },
-        RectrayBundle {
-            transform_2d: Transform2D {
-                anchor,
-                center: anchor,
-                ..Default::default()
-            },
-            dimension: Dimension(Vec2::new(15., 10.)),
+        Transform2D {
+            anchor,
+            center: anchor,
             ..Default::default()
         },
+        Dimension(Vec2::new(15., 10.)),
     ));
 }

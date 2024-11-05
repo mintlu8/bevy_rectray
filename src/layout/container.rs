@@ -1,8 +1,11 @@
 use std::ops::{Range, RangeFull, RangeInclusive};
 
-use bevy_ecs::{component::Component, reflect::ReflectComponent};
-use bevy_math::Vec2;
-use bevy_reflect::{std_traits::ReflectDefault, Reflect};
+use bevy::ecs::{component::Component, reflect::ReflectComponent};
+use bevy::math::Vec2;
+use bevy::prelude::Visibility;
+use bevy::reflect::{std_traits::ReflectDefault, Reflect};
+
+use crate::Transform2D;
 
 use super::{LayoutObject, LayoutOutput};
 
@@ -87,6 +90,7 @@ impl From<RangeInclusive<usize>> for LayoutRange {
 /// A configurable container that lays out a sequence of Entities.
 #[derive(Debug, Component, Default, Clone, Reflect)]
 #[reflect(Component, Default)]
+#[require(Transform2D, Visibility)]
 pub struct Container {
     /// Layout of the container.
     pub layout: LayoutObject,

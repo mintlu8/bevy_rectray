@@ -1,6 +1,3 @@
-[workspace]
-members = ["picking"]
-
 [package]
 name = "bevy_rectray"
 version = "0.1.1"
@@ -18,16 +15,11 @@ keywords = ["bevy", "layout", "ui"]
 
 
 [dependencies]
-bevy_app = "0.14.0"
-bevy_ecs = "0.14.0"
-bevy_hierarchy = "0.14.0"
-bevy_math = "0.14.0"
-bevy_reflect = "0.14.0"
-bevy_transform = "0.14.0"
+bevy = { version = "0.15.0-rc.2", default-features = false }
 downcast-rs = "1.2.1"
 serde = { version = "1.0.204", features = ["derive"] }
 
 [dev-dependencies]
-bevy = "0.14.0"
+bevy = "0.15.0-rc.2"
 fastrand = "2.1.0"
 itertools = "0.13.0"

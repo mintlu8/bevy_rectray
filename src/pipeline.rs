@@ -1,11 +1,11 @@
 use std::mem;
 
-use bevy_ecs::{
+use bevy::ecs::{
     entity::Entity,
     system::{Local, Query},
 };
-use bevy_hierarchy::Children;
-use bevy_transform::components::Transform;
+use bevy::hierarchy::Children;
+use bevy::transform::components::Transform;
 
 use crate::{
     hierarchy::RectrayFrame,

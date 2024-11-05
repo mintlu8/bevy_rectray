@@ -1,7 +1,7 @@
 use std::{iter::repeat, mem};
 
-use bevy_ecs::entity::Entity;
-use bevy_math::Vec2;
+use bevy::ecs::entity::Entity;
+use bevy::math::Vec2;
 
 use crate::layout::{
     Layout, LayoutControl, LayoutOutput, ParagraphLayout, SpanLayout, StackLayout,

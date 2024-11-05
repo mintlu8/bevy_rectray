@@ -13,19 +13,22 @@
 //! Add [`RectrayPickable`] and [`PickableBundle`](bevy_mod_picking::PickableBundle) to entities you want to be pickable, that's it!
 
 #![allow(clippy::type_complexity)]
-use bevy_app::{Plugin, PreUpdate};
-use bevy_ecs::{
+use bevy::ecs::{
     component::Component,
     entity::Entity,
     event::EventWriter,
     query::With,
     system::{Query, Res},
 };
-use bevy_math::{primitives::InfinitePlane3d, Vec2, Vec3Swizzles};
-use bevy_mod_picking::backend::{ray::RayMap, HitData, PointerHits};
-use bevy_rectray::{RotatedRect, Transform2D};
-use bevy_render::{camera::Camera, view::RenderLayers};
-use bevy_transform::components::GlobalTransform;
+use bevy::math::{primitives::InfinitePlane3d, Vec2, Vec3Swizzles};
+use bevy::transform::components::GlobalTransform;
+use bevy::{
+    picking::backend::{ray::RayMap, HitData, PointerHits},
+    prelude::Camera,
+    render::view::RenderLayers,
+};
+
+use crate::{RotatedRect, Transform2D};
 
 /// Make an item pickable in the `bevy_rectray` backend.
 ///
@@ -100,14 +103,5 @@ pub fn rectray_picking_backend(
         if !event.picks.is_empty() {
             writer.send(event);
         }
-    }
-}
-
-/// Plugin for adding a [`bevy_mod_picking`] backed for [`bevy_rectray`].
-pub struct RectrayPickingBackendPlugin;
-
-impl Plugin for RectrayPickingBackendPlugin {
-    fn build(&self, app: &mut bevy_app::App) {
-        app.add_systems(PreUpdate, rectray_picking_backend);
     }
 }

@@ -27,8 +27,8 @@
 //! # */
 //! ```
 //!
-//! To place descendant entities inside the frame, add [`RectrayBundle`] next to entities
-//! with [`TransformBundle`](bevy_transform::prelude::TransformBundle)s.
+//! To place descendant entities inside the frame, add [`Transform2D`] and [`Dimension`] next to entities
+//! with [`Transform`](bevy::prelude::Transform)s.
 //!
 //!
 //! ```
@@ -92,22 +92,22 @@
 //! See [module](crate::layout) level documentation for details.
 //!
 
-use bevy_app::{Plugin, PostUpdate};
-use bevy_ecs::{
-    bundle::Bundle,
-    schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet},
-};
-use bevy_transform::TransformSystem;
+use bevy::app::{App, Plugin, PostUpdate, PreUpdate};
+use bevy::ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
+use bevy::transform::TransformSystem;
 use layout::{Container, LayoutControl};
 
 mod hierarchy;
 
 pub mod layout;
+mod picking;
 mod pipeline;
 mod rect;
 mod transform;
 
 pub use hierarchy::*;
+use picking::rectray_picking_backend;
+pub use picking::RectrayPickable;
 pub use pipeline::compute_transform_2d;
 pub use rect::{Anchor, RotatedRect};
 pub use transform::{Dimension, Transform2D};
@@ -120,7 +120,7 @@ pub struct RectrayPlugin;
 pub struct RectrayTransformSet;
 
 impl Plugin for RectrayPlugin {
-    fn build(&self, app: &mut bevy_app::App) {
+    fn build(&self, app: &mut App) {
         app.register_type::<Transform2D>();
         app.register_type::<Dimension>();
         app.register_type::<Container>();
@@ -130,36 +130,52 @@ impl Plugin for RectrayPlugin {
             PostUpdate,
             RectrayTransformSet.before(TransformSystem::TransformPropagate),
         );
+        app.add_systems(PreUpdate, rectray_picking_backend);
         app.add_systems(PostUpdate, compute_transform_2d.in_set(RectrayTransformSet));
     }
 }
 
-/// [`Bundle`] for `bevy_rectray`'s features, must be paired with a
-/// `TransformBundle`.
-#[derive(Debug, Default, Bundle)]
-pub struct RectrayBundle {
-    /// Transform of the item.
-    pub transform_2d: Transform2D,
-    /// Dimension of the item.
-    pub dimension: Dimension,
-    /// Controls special behavior regarding layouts.
-    pub layout: LayoutControl,
-    /// This is an output node and can be left as `default`.
-    pub rotated_rect: RotatedRect,
+#[allow(deprecated)]
+mod bundles {
+    use bevy::prelude::Bundle;
+
+    use crate::{
+        layout::{Container, LayoutControl},
+        Dimension, RotatedRect, Transform2D,
+    };
+
+    /// [`Bundle`] for `bevy_rectray`'s features, must be paired with a
+    /// `TransformBundle`.
+    #[derive(Debug, Default, Bundle)]
+    #[deprecated = "Add `Transform2D` and `Dimension` (optional) directly."]
+    pub struct RectrayBundle {
+        /// Transform of the item.
+        pub transform_2d: Transform2D,
+        /// Dimension of the item.
+        pub dimension: Dimension,
+        /// Controls special behavior regarding layouts.
+        pub layout: LayoutControl,
+        /// This is an output node and can be left as `default`.
+        pub rotated_rect: RotatedRect,
+    }
+
+    /// [`Bundle`] for `bevy_rectray`'s features and a container, must be paired with a
+    /// `TransformBundle`.
+    #[derive(Debug, Default, Bundle)]
+    #[deprecated = "Add `Transform2D`, `Dimension` and `Container` directly."]
+    pub struct RectrayContainerBundle {
+        /// Transform of the item.
+        pub transform_2d: Transform2D,
+        /// Dimension of the item.
+        pub dimension: Dimension,
+        /// Container of the layout.
+        pub container: Container,
+        /// Controls special behavior regarding layouts.
+        pub layout: LayoutControl,
+        /// This is an output node and can be left as `default`.
+        pub rotated_rect: RotatedRect,
+    }
 }
 
-/// [`Bundle`] for `bevy_rectray`'s features and a container, must be paired with a
-/// `TransformBundle`.
-#[derive(Debug, Default, Bundle)]
-pub struct RectrayContainerBundle {
-    /// Transform of the item.
-    pub transform_2d: Transform2D,
-    /// Dimension of the item.
-    pub dimension: Dimension,
-    /// Container of the layout.
-    pub container: Container,
-    /// Controls special behavior regarding layouts.
-    pub layout: LayoutControl,
-    /// This is an output node and can be left as `default`.
-    pub rotated_rect: RotatedRect,
-}
+#[allow(deprecated)]
+pub use bundles::{RectrayBundle, RectrayContainerBundle};
