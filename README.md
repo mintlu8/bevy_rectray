@@ -99,7 +99,8 @@ See module level documentation for details.
 
 | bevy | bevy_rectray |
 |------|--------------|
-| 0.14 | latest       |
+| 0.14 | 0.1          |
+| 0.15 | 0.2-latest   |
 
 ## License
 
