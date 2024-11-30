@@ -118,8 +118,12 @@ pub fn picking_cursor(
         }
     }
     if hovering {
-        commands.entity(window).insert(CursorIcon::System(SystemCursorIcon::Pointer));
+        commands
+            .entity(window)
+            .insert(CursorIcon::System(SystemCursorIcon::Pointer));
     } else {
-        commands.entity(window).insert(CursorIcon::System(SystemCursorIcon::Default));
+        commands
+            .entity(window)
+            .insert(CursorIcon::System(SystemCursorIcon::Default));
     }
 }

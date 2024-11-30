@@ -27,17 +27,14 @@ commands.spawn(
 )
 ```
 
-To place descendant entities inside the frame, add [`Transform2D`] and [`Dimension`] next to entities
+To place descendant entities inside the frame, add `Transform2D` and `Dimension` next to entities
 with `Transform`s.
 
 ```rust
-commands.spawn(
-    PbrBundle {
-        ...
-    },
-    RectrayBundle {
-        ...
-    }
+commands.spawn (
+    Transform { .. },
+    Transform2D { .. },
+    Dimension { .. },
 )
 ```
 

@@ -1,6 +1,6 @@
 [package]
 name = "bevy_rectray"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 
 authors = ["Mincong Lu <mintlux667@gmail.com>"]
@@ -13,13 +13,12 @@ A minimal 2d layout system for bevy.
 """
 keywords = ["bevy", "layout", "ui"]
 
-
 [dependencies]
-bevy = { version = "0.15.0-rc.2", default-features = false }
+bevy = { version = "0.15.0", default-features = false }
 downcast-rs = "1.2.1"
 serde = { version = "1.0.204", features = ["derive"] }
 
 [dev-dependencies]
-bevy = "0.15.0-rc.2"
+bevy = "0.15.0"
 fastrand = "2.1.0"
 itertools = "0.13.0"

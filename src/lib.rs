@@ -33,13 +33,10 @@
 //!
 //! ```
 //! # /*
-//! commands.spawn(
-//!     PbrBundle {
-//!         ...
-//!     },
-//!     RectrayBundle {
-//!         ...
-//!     }
+//! commands.spawn (
+//!     Transform { .. },
+//!     Transform2D { .. },
+//!     Dimension { .. },
 //! )
 //! # */
 //! ```

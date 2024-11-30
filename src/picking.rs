@@ -28,12 +28,13 @@ use bevy::{
     render::view::RenderLayers,
 };
 
-use crate::{RotatedRect, Transform2D};
+use crate::{Dimension, RotatedRect, Transform2D};
 
 /// Make an item pickable in the `bevy_rectray` backend.
 ///
 /// Note: alternatives like the raycast backend or the sprite backend might be more desireable in some cases.
 #[derive(Debug, Component, Default, Clone, Copy, PartialEq, Eq)]
+#[require(Transform2D, Dimension)]
 pub struct RectrayPickable;
 
 /// System for the backed.
