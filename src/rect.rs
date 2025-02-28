@@ -132,6 +132,8 @@ pub struct RotatedRect {
     pub z: f32,
     /// Scale of the rect.
     pub scale: Vec2,
+    /// Entity of the frame.
+    pub frame_entity: Option<Entity>,
 }
 
 /// Relevant info about a parent.
@@ -141,6 +143,37 @@ pub struct ParentInfo {
     pub dimension: Vec2,
     pub center: Vec2,
     pub anchor: Option<Vec2>,
+    pub affine: Transform2,
+    pub frame: Entity,
+    pub frame_rect: Rect,
+}
+
+#[doc(hidden)]
+#[derive(Debug, Copy, Clone)]
+pub struct Transform2 {
+    pub translation: Vec2,
+    pub rotation: f32,
+    pub scale: Vec2,
+}
+
+impl Transform2 {
+    pub const IDENTITY: Transform2 = Transform2 {
+        translation: Vec2::ZERO,
+        rotation: 0.,
+        scale: Vec2::ONE,
+    };
+
+    pub fn mul(&self, other: Transform2) -> Self {
+        Transform2 {
+            translation: self.transform_point2(other.translation),
+            rotation: self.rotation + other.rotation,
+            scale: self.scale * other.scale,
+        }
+    }
+
+    pub fn transform_point2(&self, point: Vec2) -> Vec2 {
+        Vec2::from_angle(self.rotation).rotate(point) * self.scale + self.translation
+    }
 }
 
 impl ParentInfo {
@@ -151,14 +184,7 @@ impl ParentInfo {
 }
 
 impl RotatedRect {
-    pub fn rect(&self) -> Rect {
-        Rect {
-            min: self.center - self.dimension / 2.,
-            max: self.center + self.dimension / 2.,
-        }
-    }
-
-    /// Find the screen space position of an anchor.
+    /// Find the frame space position of an anchor.
     #[inline]
     pub fn anchor(&self, anchor: Anchor) -> Vec2 {
         Vec2::from_angle(self.rotation).rotate(self.dimension * anchor) + self.center
@@ -170,10 +196,18 @@ impl RotatedRect {
         self.dimension / 2.
     }
 
-    /// convert a screen space point to local space, centered on `Center`.
+    /// convert a frame space point to local space, centered on `Center`.
     #[inline]
     pub fn local_space(&self, position: Vec2) -> Vec2 {
         Vec2::from_angle(-self.rotation).rotate(position - self.center)
+    }
+
+    pub(crate) fn transform2_at(&self, center: Vec2) -> Transform2 {
+        Transform2 {
+            translation: self.anchor((-center).into()),
+            rotation: self.rotation,
+            scale: self.scale,
+        }
     }
 
     pub fn transform_at(&self, center: Vec2) -> Transform {
@@ -184,24 +218,98 @@ impl RotatedRect {
         }
     }
 
+    pub(crate) fn under_transform2(mut self, transform: Transform2) -> Self {
+        self.center = transform.transform_point2(self.center);
+        self.rotation += transform.rotation;
+        self.scale *= transform.scale;
+        self
+    }
+
     /// Create an [`RotatedRect`] representing the sprite's position in parent space.
     #[inline]
-    pub fn construct(parent: &ParentInfo, transform: &Transform2D, dimension: Vec2) -> Self {
+    pub fn construct(
+        parent: &ParentInfo,
+        transform: &Transform2D,
+        dimension: Vec2,
+        frame: Entity,
+    ) -> Self {
         let parent_anchor = parent.anchor.unwrap_or(transform.get_parent_anchor());
+        let anchor = transform.anchor.as_vec();
+        Self::construct2(parent, transform, parent_anchor, anchor, dimension, frame)
+    }
+
+    /// Create an [`RotatedRect`] representing the sprite's position in parent space.
+    #[inline]
+    #[doc(hidden)]
+    pub fn construct2(
+        parent: &ParentInfo,
+        transform: &Transform2D,
+        parent_anchor: Vec2,
+        anchor: Vec2,
+        dimension: Vec2,
+        frame: Entity,
+    ) -> Self {
         let root = parent.dimension * parent_anchor;
         // apply offset and dimension
-        let self_center = root
-            + transform.offset
-            + (transform.get_center() - transform.anchor.as_vec()) * dimension;
+        let self_center = root + transform.offset + (transform.get_center() - anchor) * dimension;
         Self {
             center: self_center,
             dimension,
             z: transform.z,
             rotation: transform.rotation,
             scale: transform.scale,
+            frame_entity: Some(frame),
         }
+    }
+
+    /// Determines if inside a [`Rect`].
+    pub fn aabb(&self) -> Rect {
+        let bl = self.anchor(Anchor::BOTTOM_LEFT);
+        let tr = self.center * 2.0 - bl;
+        Rect {
+            min: bl.min(tr),
+            max: bl.max(tr),
+        }
+    }
+
+    /// Determines if inside a [`Rect`].
+    pub fn is_inside(&self, rect: Rect) -> bool {
+        let bl = self.anchor(Anchor::BOTTOM_LEFT);
+        let tr = self.center * 2.0 - bl;
+        rect.contains(bl) && rect.contains(tr)
+    }
+
+    /// Nudge the [`RotatedRect`] inside the [`Rect`],
+    /// does nothing if aabb is larger than [`Rect`].
+    pub fn nudge_inside(&mut self, bounds: Rect) {
+        let aabb = self.aabb();
+        if aabb.size().cmpgt(bounds.size()).any() {
+            return;
+        }
+        nudge_aabb_with(&mut self.center, aabb, bounds);
+    }
+
+    /// Nudge the [`RotatedRect`] inside the [`Rect`],
+    /// does nothing if aabb is larger than [`Rect`].
+    pub(crate) fn nudge_inside_ext(&self, bounds: Rect, value: &mut Vec2) {
+        let aabb = self.aabb();
+        if aabb.size().cmpgt(bounds.size()).any() {
+            return;
+        }
+        nudge_aabb_with(value, aabb, bounds);
     }
 }
 
-#[derive(Debug)]
-pub struct FrameReference(pub Entity);
+fn nudge_aabb_with(output: &mut Vec2, aabb: Rect, bounds: Rect) {
+    if aabb.min.x < bounds.min.x {
+        output.x += bounds.min.x - aabb.min.x;
+    } else if aabb.max.x > bounds.max.x {
+        output.x -= aabb.max.x - bounds.max.x;
+    }
+
+    if aabb.min.y < bounds.min.y {
+        output.y += bounds.min.y - aabb.min.y;
+    } else if aabb.max.y > bounds.max.y {
+        output.y -= aabb.max.y - bounds.max.y;
+    }
+}

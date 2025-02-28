@@ -5,18 +5,16 @@ use bevy::{
 use serde::{Deserialize, Serialize};
 
 use crate::Anchor;
-
-/// # Meanings
+/// Anchor and direction for a tooltip like object.
 ///
-/// `T` means [`Anchor::TOP_CENTER`] then go up.
-/// `TL` means [`Anchor::TOP_LEFT`] then go bottom left.
-/// `LT` means [`Anchor::TOP_LEFT`] then go top right.
+/// * `T` means [`Anchor::TOP_CENTER`] then go up.
+/// * `TL` means [`Anchor::TOP_LEFT`] then go bottom left.
+/// * `LT` means [`Anchor::TOP_LEFT`] then go top right.
 #[derive(Debug, Clone, Copy, Default, Reflect, Serialize, Deserialize)]
 #[reflect(Default, Serialize, Deserialize)]
 #[repr(u8)]
 pub enum AnchorDirection {
     #[default]
-    None,
     B,
     L,
     T,
@@ -34,7 +32,6 @@ pub enum AnchorDirection {
 impl AnchorDirection {
     pub fn to_parent_anchor(self) -> Anchor {
         match self {
-            AnchorDirection::None => Anchor::CENTER,
             AnchorDirection::B => Anchor::BOTTOM_CENTER,
             AnchorDirection::L => Anchor::CENTER_LEFT,
             AnchorDirection::T => Anchor::TOP_CENTER,
@@ -52,7 +49,6 @@ impl AnchorDirection {
 
     pub fn to_anchor(self) -> Anchor {
         match self {
-            AnchorDirection::None => Anchor::CENTER,
             AnchorDirection::B => Anchor::TOP_CENTER,
             AnchorDirection::L => Anchor::CENTER_RIGHT,
             AnchorDirection::T => Anchor::BOTTOM_CENTER,
@@ -69,20 +65,46 @@ impl AnchorDirection {
     }
 }
 
-/// Tries up to 4 combinations of `anchor` and `parent_anchor` combinations
-/// until we find one inside the [`RectrayFrame`].
-#[derive(Debug, Clone, Copy, Default, Reflect, Serialize, Deserialize, Component)]
-#[reflect(Default, Serialize, Deserialize, Component)]
-pub struct ToolTip([AnchorDirection; 4]);
+/// Determines how an object reacts if out of frame.
+#[derive(Debug, Clone, Default, Reflect, Serialize, Deserialize, Component)]
+#[reflect(Serialize, Deserialize, Component)]
+pub enum OutOfFrameBehavior {
+    /// Do nothing.
+    #[default]
+    None,
+    /// If out of frame, nudge the rectangle into the frame.
+    ///
+    /// # Note
+    ///
+    /// Only works if the parent's global rotation is `0`,
+    /// since we work on local transform.
+    Nudge,
+    /// Changes the combination of `anchor` and `parent_anchor` until in screen,
+    /// if all choices failed, use `Transform2d`.
+    FlexAnchor {
+        choices: [AnchorDirection; 4],
+        len: u8,
+    },
+}
 
-impl ToolTip {
-    pub const fn new(directions: &[AnchorDirection]) -> Self {
-        let mut arr = [AnchorDirection::None; 4];
+impl OutOfFrameBehavior {
+    pub const fn flex_anchor(directions: &[AnchorDirection]) -> Self {
+        let mut arr = [AnchorDirection::B; 4];
         let mut i = 0;
         while i < 4 && i < directions.len() {
             arr[i] = directions[i];
             i += 1;
         }
-        ToolTip(arr)
+        OutOfFrameBehavior::FlexAnchor {
+            choices: arr,
+            len: i as u8,
+        }
+    }
+
+    pub fn iter_flex_anchor(&self) -> &[AnchorDirection] {
+        match self {
+            OutOfFrameBehavior::FlexAnchor { choices, len } => &choices[0..*len as usize],
+            _ => &[],
+        }
     }
 }

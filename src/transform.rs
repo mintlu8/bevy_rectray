@@ -1,6 +1,4 @@
-use crate::layout::LayoutControl;
-use crate::rect::Anchor;
-use crate::RotatedRect;
+use crate::{Anchor, LayoutControl, OutOfFrameBehavior, RotatedRect};
 use bevy::ecs::{component::Component, reflect::ReflectComponent};
 use bevy::math::Vec2;
 use bevy::prelude::{Transform, Visibility};
@@ -10,7 +8,14 @@ use serde::{Deserialize, Serialize};
 /// The 2D transform component for `bevy_rectray`.
 #[derive(Debug, Copy, Clone, Component, Serialize, Deserialize, Reflect)]
 #[reflect(Component, Serialize, Deserialize, Default)]
-#[require(Transform, Visibility, Dimension, LayoutControl, RotatedRect)]
+#[require(
+    Transform,
+    Visibility,
+    Dimension,
+    LayoutControl,
+    RotatedRect,
+    OutOfFrameBehavior
+)]
 pub struct Transform2D {
     /// The anchor matched on the child side.
     ///

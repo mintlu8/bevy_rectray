@@ -7,6 +7,8 @@ use bevy::ecs::{
 use bevy::hierarchy::Children;
 use bevy::transform::components::Transform;
 
+use crate::rect::Transform2;
+use crate::OutOfFrameBehavior;
 use crate::{
     hierarchy::RectrayFrame,
     layout::{Container, LayoutControl, LayoutInfo, LayoutItem, LayoutOutput},
@@ -14,7 +16,13 @@ use crate::{
     transform::{Dimension, Transform2D},
 };
 
-type REntity<'t> = (Entity, &'t Dimension, &'t Transform2D, &'t LayoutControl);
+type REntity<'t> = (
+    Entity,
+    &'t Dimension,
+    &'t Transform2D,
+    &'t OutOfFrameBehavior,
+    &'t LayoutControl,
+);
 
 #[allow(clippy::too_many_arguments)]
 #[allow(clippy::needless_pass_by_ref_mut)]
@@ -31,7 +39,7 @@ fn propagate(
         return;
     }
 
-    let Ok((entity, dim, transform, ..)) = mut_query.get(entity) else {
+    let Ok((entity, dim, transform, behavior, ..)) = mut_query.get(entity) else {
         return;
     };
 
@@ -79,12 +87,17 @@ fn propagate(
         if !fac.is_nan() {
             entity_anchors.iter_mut().for_each(|(_, anc)| *anc *= fac);
         }
-        let rect = RotatedRect::construct(&parent, transform, size);
+        let rect = RotatedRect::construct(&parent, transform, size, parent.frame);
 
         let info = ParentInfo {
             dimension: new_dim,
             center: transform.get_center(),
             anchor: None,
+            affine: parent
+                .affine
+                .mul(rect.transform2_at(transform.get_center())),
+            frame: parent.frame,
+            frame_rect: parent.frame_rect,
         };
 
         queue.extend(
@@ -93,7 +106,7 @@ fn propagate(
                 .map(|(e, anc)| (e, info.with_anchor(anc))),
         );
         if let Ok((mut t, mut r)) = transform_query.get_mut(entity) {
-            *r = rect;
+            *r = rect.under_transform2(parent.affine);
             *t = rect.transform_at(transform.get_center());
         }
         for (child, _) in other_entities {
@@ -102,22 +115,55 @@ fn propagate(
         return;
     }
 
-    let rect = RotatedRect::construct(&parent, transform, dimension);
+    let rect = match behavior {
+        OutOfFrameBehavior::None => {
+            RotatedRect::construct(&parent, transform, dimension, parent.frame)
+        }
+        OutOfFrameBehavior::Nudge => {
+            let mut rect = RotatedRect::construct(&parent, transform, dimension, parent.frame);
+            let frame_space_rect = rect.under_transform2(parent.affine);
+            frame_space_rect.nudge_inside_ext(parent.frame_rect, &mut rect.center);
+            rect
+        }
+        OutOfFrameBehavior::FlexAnchor { .. } => {
+            let mut result = RotatedRect::construct(&parent, transform, dimension, parent.frame);
+            for anchor in behavior.iter_flex_anchor() {
+                let rect = RotatedRect::construct2(
+                    &parent,
+                    transform,
+                    anchor.to_parent_anchor().into(),
+                    anchor.to_anchor().into(),
+                    dimension,
+                    parent.frame,
+                );
+                let frame_space_rect = rect.under_transform2(parent.affine);
+                if frame_space_rect.is_inside(parent.frame_rect) {
+                    result = rect;
+                }
+            }
+            result
+        }
+    };
 
     if let Ok(children) = child_query.get(entity) {
         let info = ParentInfo {
             dimension,
             anchor: None,
             center: transform.get_center(),
+            affine: parent
+                .affine
+                .mul(rect.transform2_at(transform.get_center())),
+            frame: parent.frame,
+            frame_rect: parent.frame_rect,
         };
         for child in children.iter().copied() {
             queue.push((child, info))
         }
     }
 
-    if let Ok((mut a, mut b)) = transform_query.get_mut(entity) {
-        *a = rect.transform_at(transform.get_center());
-        *b = rect;
+    if let Ok((mut t, mut r)) = transform_query.get_mut(entity) {
+        *t = rect.transform_at(transform.get_center());
+        *r = rect.under_transform2(parent.affine);
     }
 }
 
@@ -125,13 +171,13 @@ fn propagate(
 pub fn compute_transform_2d(
     mut queue_a: Local<Vec<(Entity, ParentInfo)>>,
     mut queue_b: Local<Vec<(Entity, ParentInfo)>>,
-    root_query: Query<(&RectrayFrame, &Children)>,
+    root_query: Query<(Entity, &RectrayFrame, &Children)>,
     mut entity_query: Query<REntity>,
     mut layout_query: Query<&mut Container>,
     child_query: Query<&Children>,
     mut transform_query: Query<(&mut Transform, &mut RotatedRect)>,
 ) {
-    for (root, children) in root_query.iter() {
+    for (frame, root, children) in root_query.iter() {
         for child in children.iter().copied() {
             queue_a.push((
                 child,
@@ -139,6 +185,9 @@ pub fn compute_transform_2d(
                     dimension: root.dimension,
                     center: root.at,
                     anchor: None,
+                    affine: Transform2::IDENTITY,
+                    frame,
+                    frame_rect: root.rect(),
                 },
             ))
         }

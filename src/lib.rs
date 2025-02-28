@@ -111,7 +111,9 @@ use picking::rectray_picking_backend;
 pub use picking::RectrayPickable;
 pub use pipeline::compute_transform_2d;
 pub use rect::{Anchor, RotatedRect};
+pub use tooltip::{AnchorDirection, OutOfFrameBehavior};
 pub use transform::{Dimension, SyncDimension, Transform2D};
+
 /// [`Plugin`] for `bevy_rectray`.
 #[derive(Debug, Clone, Copy)]
 pub struct RectrayPlugin;

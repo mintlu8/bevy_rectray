@@ -15,7 +15,7 @@
 #![allow(clippy::type_complexity)]
 use bevy::ecs::{
     component::Component,
-    entity::Entity,
+    entity::{Entity, EntityHashMap},
     event::EventWriter,
     query::With,
     system::{Query, Res},
@@ -28,7 +28,7 @@ use bevy::{
     render::view::RenderLayers,
 };
 
-use crate::{Dimension, RotatedRect, Transform2D};
+use crate::{Dimension, RectrayFrame, RotatedRect, Transform2D};
 
 /// Make an item pickable in the `bevy_rectray` backend.
 ///
@@ -41,19 +41,14 @@ pub struct RectrayPickable;
 pub fn rectray_picking_backend(
     map: Res<RayMap>,
     layers: Query<(Option<&RenderLayers>, &Camera)>,
-    query: Query<
-        (
-            Entity,
-            &RotatedRect,
-            &GlobalTransform,
-            &Transform2D,
-            Option<&RenderLayers>,
-        ),
-        With<RectrayPickable>,
-    >,
+    frames: Query<&GlobalTransform, With<RectrayFrame>>,
+    query: Query<(Entity, &RotatedRect, Option<&RenderLayers>), With<RectrayPickable>>,
     mut writer: EventWriter<PointerHits>,
 ) {
+    let mut inverses = EntityHashMap::default();
     for (ray_id, ray) in map.iter() {
+        let mut ray_hits = EntityHashMap::default();
+
         let Ok((layer, cam)) = layers.get(ray_id.camera) else {
             continue;
         };
@@ -67,7 +62,7 @@ pub fn rectray_picking_backend(
             picks: Vec::new(),
             order: cam.order as f32,
         };
-        for (entity, rect, transform, transform_2d, layers) in query.iter() {
+        for (entity, rect, layers) in query.iter() {
             let layer = if let Some(layer) = layers {
                 layer
             } else {
@@ -76,13 +71,26 @@ pub fn rectray_picking_backend(
             if !cam_layer.intersects(layer) {
                 continue;
             }
-            let plane = InfinitePlane3d::new(transform.forward());
-            let Some(depth) = ray.intersect_plane(transform.translation(), plane) else {
+            let Some(frame) = rect.frame_entity else {
                 continue;
             };
-            let position = ray.get_point(depth);
-            let local = transform.affine().inverse().transform_point3(position);
-            let local = local.xy() - rect.dimension * transform_2d.center;
+            let ray_hit = ray_hits.entry(frame).or_insert_with(|| {
+                let transform = frames.get(frame).ok()?;
+                let inv = inverses
+                    .entry(frame)
+                    .or_insert_with(|| transform.affine().inverse());
+                let plane = InfinitePlane3d::new(transform.forward());
+                let depth = ray.intersect_plane(transform.translation(), plane)?;
+                Some((
+                    inv.transform_point3(ray.get_point(depth)),
+                    depth,
+                    transform.forward(),
+                ))
+            });
+            let Some((ray_hit, depth, forward)) = *ray_hit else {
+                continue;
+            };
+            let local = ray_hit.xy() - rect.center;
             let half_size = rect.dimension * rect.scale / 2.0;
             let inside = Vec2::from_angle(-rect.rotation)
                 .rotate(local)
@@ -95,8 +103,8 @@ pub fn rectray_picking_backend(
                     HitData {
                         camera: ray_id.camera,
                         depth,
-                        position: Some(position),
-                        normal: Some(transform.forward().into()),
+                        position: Some(ray_hit),
+                        normal: Some(forward.into()),
                     },
                 ))
             }

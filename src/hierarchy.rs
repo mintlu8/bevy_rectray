@@ -1,13 +1,14 @@
 use bevy::ecs::{component::Component, reflect::ReflectComponent};
-use bevy::math::Vec2;
-use bevy::prelude::{Transform, Visibility};
+use bevy::math::{Rect, Vec2};
+use bevy::prelude::{ReflectDefault, ReflectDeserialize, ReflectSerialize, Transform, Visibility};
 use bevy::reflect::Reflect;
+use serde::{Deserialize, Serialize};
 
 use crate::rect::Anchor;
 
 /// A root node that creates an area to place child entities.
-#[derive(Debug, Default, Reflect, Component)]
-#[reflect(Component)]
+#[derive(Debug, Default, Reflect, Component, Serialize, Deserialize)]
+#[reflect(Component, Default, Serialize, Deserialize)]
 #[require(Transform, Visibility)]
 pub struct RectrayFrame {
     pub dimension: Vec2,
@@ -35,5 +36,13 @@ impl RectrayFrame {
     pub const fn with_z(mut self, z: f32) -> Self {
         self.z = z;
         self
+    }
+
+    pub fn rect(&self) -> Rect {
+        let min = self.dimension * self.at;
+        Rect {
+            min,
+            max: min + self.dimension,
+        }
     }
 }
