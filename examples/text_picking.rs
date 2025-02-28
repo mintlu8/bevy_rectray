@@ -52,7 +52,7 @@ pub fn init(mut commands: Commands) {
         .with_children(|builder| {
             builder
                 .spawn((
-                    Transform2D::UNIT,
+                    Transform2D::IDENTITY,
                     Dimension(Vec2::new(1024., 768.)),
                     Container {
                         layout: LayoutObject::new(ParagraphLayout::PARAGRAPH),

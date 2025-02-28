@@ -83,7 +83,7 @@ fn propagate(
 
         let info = ParentInfo {
             dimension: new_dim,
-            at: transform.get_center(),
+            center: transform.get_center(),
             anchor: None,
         };
 
@@ -92,9 +92,9 @@ fn propagate(
                 .into_iter()
                 .map(|(e, anc)| (e, info.with_anchor(anc))),
         );
-        if let Ok((mut a, mut b)) = transform_query.get_mut(entity) {
-            *b = rect;
-            *a = rect.transform_at(transform.get_center());
+        if let Ok((mut t, mut r)) = transform_query.get_mut(entity) {
+            *r = rect;
+            *t = rect.transform_at(transform.get_center());
         }
         for (child, _) in other_entities {
             queue.push((child, info))
@@ -108,7 +108,7 @@ fn propagate(
         let info = ParentInfo {
             dimension,
             anchor: None,
-            at: transform.get_center(),
+            center: transform.get_center(),
         };
         for child in children.iter().copied() {
             queue.push((child, info))
@@ -137,7 +137,7 @@ pub fn compute_transform_2d(
                 child,
                 ParentInfo {
                     dimension: root.dimension,
-                    at: root.at,
+                    center: root.at,
                     anchor: None,
                 },
             ))

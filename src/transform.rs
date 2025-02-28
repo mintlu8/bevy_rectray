@@ -48,7 +48,7 @@ impl Transform2D {
         self.parent_anchor.or(self.anchor).into()
     }
 
-    pub const UNIT: Self = Self {
+    pub const IDENTITY: Self = Self {
         anchor: Anchor::CENTER,
         parent_anchor: Anchor::INHERIT,
         center: Anchor::CENTER,
@@ -57,6 +57,9 @@ impl Transform2D {
         z: 0.01,
         scale: Vec2::ONE,
     };
+
+    #[deprecated = "Use IDENTITY instead."]
+    pub const UNIT: Self = Self::IDENTITY;
 
     /// Set offset.
     #[inline]
@@ -110,15 +113,40 @@ impl Transform2D {
 
 impl Default for Transform2D {
     fn default() -> Self {
-        Self::UNIT
+        Self::IDENTITY
     }
 }
 
 /// Dimension of the widget, this is a suggestion and can be modified via `Layout`.
 #[derive(Debug, Clone, Copy, PartialEq, Default, Component, Serialize, Deserialize, Reflect)]
-#[reflect(Component, Serialize, Deserialize)]
+#[reflect(Component, Default, Serialize, Deserialize)]
 pub struct Dimension(pub Vec2);
 
 impl Dimension {
     pub const ZERO: Dimension = Dimension(Vec2::ZERO);
+}
+
+/// Synchronize [`Dimension`] from or to another component like [`Sprite`](bevy::prelude::Sprite).
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Component, Default, Serialize, Deserialize, Reflect,
+)]
+#[reflect(Component, Default, Serialize, Deserialize)]
+#[repr(u8)]
+pub enum SyncDimension {
+    /// Don't transfer dimension.
+    #[default]
+    None,
+    /// Set the component's value from [`Dimension`].
+    FromDimension,
+    /// Set [`Dimension`] from the component's value.
+    ToDimension,
+    /// Set the component's value that fits inside [`Dimension`],
+    /// and proportional to its underlying image's aspect ratio.
+    FromAspectDimension,
+    /// Set the component's value from [`Dimension`]'s `x`,
+    /// and proportional to its underlying image's aspect ratio.
+    FromAspectDimensionX,
+    /// Set the component's value from [`Dimension`]'s `y`,
+    /// and proportional to its underlying image's aspect ratio.
+    FromAspectDimensionY,
 }

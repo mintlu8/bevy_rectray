@@ -1,5 +1,6 @@
 use std::ops::{Mul, Neg};
 
+use bevy::ecs::entity::Entity;
 use bevy::ecs::{component::Component, reflect::ReflectComponent};
 use bevy::math::{Quat, Rect, Vec2};
 use bevy::reflect::{std_traits::ReflectDefault, Reflect, ReflectDeserialize, ReflectSerialize};
@@ -138,7 +139,7 @@ pub struct RotatedRect {
 #[derive(Debug, Copy, Clone)]
 pub struct ParentInfo {
     pub dimension: Vec2,
-    pub at: Vec2,
+    pub center: Vec2,
     pub anchor: Option<Vec2>,
 }
 
@@ -201,3 +202,6 @@ impl RotatedRect {
         }
     }
 }
+
+#[derive(Debug)]
+pub struct FrameReference(pub Entity);

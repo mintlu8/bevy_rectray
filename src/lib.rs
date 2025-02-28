@@ -100,14 +100,18 @@ pub mod layout;
 mod picking;
 mod pipeline;
 mod rect;
+#[cfg(feature = "2d")]
+mod sync_sprite;
+mod tooltip;
 mod transform;
+mod window;
 
 pub use hierarchy::*;
 use picking::rectray_picking_backend;
 pub use picking::RectrayPickable;
 pub use pipeline::compute_transform_2d;
 pub use rect::{Anchor, RotatedRect};
-pub use transform::{Dimension, Transform2D};
+pub use transform::{Dimension, SyncDimension, Transform2D};
 /// [`Plugin`] for `bevy_rectray`.
 #[derive(Debug, Clone, Copy)]
 pub struct RectrayPlugin;
@@ -123,12 +127,15 @@ impl Plugin for RectrayPlugin {
         app.register_type::<Container>();
         app.register_type::<RotatedRect>();
         app.register_type::<LayoutControl>();
+        app.register_type::<SyncDimension>();
         app.configure_sets(
             PostUpdate,
             RectrayTransformSet.before(TransformSystem::TransformPropagate),
         );
         app.add_systems(PreUpdate, rectray_picking_backend);
         app.add_systems(PostUpdate, compute_transform_2d.in_set(RectrayTransformSet));
+        #[cfg(feature = "2d")]
+        app.add_plugins(sync_sprite::SyncSpritePlugin);
     }
 }
 

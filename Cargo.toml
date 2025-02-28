@@ -13,8 +13,12 @@ A minimal 2d layout system for bevy.
 """
 keywords = ["bevy", "layout", "ui"]
 
+[features]
+default = ["2d"]
+2d = ["bevy/bevy_sprite"]
+
 [dependencies]
-bevy = { version = "0.15.0", default-features = false, features = ["bevy_picking", "bevy_render"]}
+bevy = { version = "0.15.2", default-features = false, features = ["bevy_picking", "bevy_render"]}
 downcast-rs = "1.2.1"
 serde = { version = "1.0.204", features = ["derive"] }
 

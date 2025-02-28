@@ -49,7 +49,7 @@ pub fn init(mut commands: Commands) {
         .with_children(|builder| {
             builder
                 .spawn((
-                    Transform2D::UNIT.with_offset(Vec2::new(0., -20.)),
+                    Transform2D::IDENTITY.with_offset(Vec2::new(0., -20.)),
                     Dimension(Vec2::new(250., 25.)),
                     Container {
                         layout: LayoutObject::new(StackLayout::HSTACK),
@@ -79,7 +79,7 @@ pub fn init(mut commands: Commands) {
             builder
                 .spawn((
                     Sprite::default(),
-                    Transform2D::UNIT.with_offset(Vec2::new(0., 20.)),
+                    Transform2D::IDENTITY.with_offset(Vec2::new(0., 20.)),
                     Dimension(Vec2::new(250., 25.)),
                     Container {
                         layout: LayoutObject::new(SpanLayout::HBOX),

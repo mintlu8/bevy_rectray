@@ -48,7 +48,7 @@ pub fn init(mut commands: Commands) {
         .with_children(|builder| {
             builder
                 .spawn((
-                    Transform2D::UNIT,
+                    Transform2D::IDENTITY,
                     Dimension(Vec2::new(800., 500.)),
                     Container {
                         layout: LayoutObject::new(ParagraphLayout::PARAGRAPH),
