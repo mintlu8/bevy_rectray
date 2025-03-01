@@ -113,6 +113,8 @@ pub use pipeline::compute_transform_2d;
 pub use rect::{Anchor, RotatedRect};
 pub use tooltip::{AnchorDirection, OutOfFrameBehavior};
 pub use transform::{Dimension, SyncDimension, Transform2D};
+use window::window_frame_system;
+pub use window::RectrayWindow;
 
 /// [`Plugin`] for `bevy_rectray`.
 #[derive(Debug, Clone, Copy)]
@@ -136,6 +138,9 @@ impl Plugin for RectrayPlugin {
         );
         app.add_systems(PreUpdate, rectray_picking_backend);
         app.add_systems(PostUpdate, compute_transform_2d.in_set(RectrayTransformSet));
+        app.add_systems(PostUpdate, window_frame_system
+            .in_set(RectrayTransformSet)
+            .before(compute_transform_2d));
         #[cfg(feature = "2d")]
         app.add_plugins(sync_sprite::SyncSpritePlugin);
     }
