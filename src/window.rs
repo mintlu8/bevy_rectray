@@ -1,8 +1,5 @@
 use bevy::{
-    ecs::{
-        query::{Changed, With},
-        system::Query,
-    },
+    ecs::{query::With, system::Query},
     prelude::{
         Component, Reflect, ReflectComponent, ReflectDefault, ReflectDeserialize, ReflectSerialize,
     },
@@ -40,4 +37,3 @@ pub fn window_frame_system(
         }
     }
 }
-

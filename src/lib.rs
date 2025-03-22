@@ -138,9 +138,12 @@ impl Plugin for RectrayPlugin {
         );
         app.add_systems(PreUpdate, rectray_picking_backend);
         app.add_systems(PostUpdate, compute_transform_2d.in_set(RectrayTransformSet));
-        app.add_systems(PostUpdate, window_frame_system
-            .in_set(RectrayTransformSet)
-            .before(compute_transform_2d));
+        app.add_systems(
+            PostUpdate,
+            window_frame_system
+                .in_set(RectrayTransformSet)
+                .before(compute_transform_2d),
+        );
         #[cfg(feature = "2d")]
         app.add_plugins(sync_sprite::SyncSpritePlugin);
     }

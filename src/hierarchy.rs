@@ -39,10 +39,10 @@ impl RectrayFrame {
     }
 
     pub fn rect(&self) -> Rect {
-        let min = self.dimension * self.at;
+        let center = self.dimension * (-self.at);
         Rect {
-            min,
-            max: min + self.dimension,
+            min: center - self.dimension / 2.0,
+            max: center + self.dimension / 2.0,
         }
     }
 }
