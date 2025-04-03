@@ -6,8 +6,8 @@ use bevy::ecs::{
     query::With,
     system::{Commands, Query, ResMut},
 };
-use bevy::hierarchy::BuildChildren;
 use bevy::math::{primitives::Cuboid, Vec2, Vec3};
+use bevy::picking::hover::PickingInteraction;
 use bevy::prelude::Entity;
 use bevy::render::{
     camera::Camera,
@@ -20,8 +20,7 @@ use bevy::{
     core_pipeline::bloom::Bloom,
     diagnostic::FrameTimeDiagnosticsPlugin,
     pbr::{MeshMaterial3d, StandardMaterial},
-    picking::focus::PickingInteraction,
-    prelude::{Camera3d, ChildBuild, Mesh3d, MeshPickingSettings, Visibility},
+    prelude::{Camera3d, Mesh3d, MeshPickingSettings, Visibility},
     window::{PrimaryWindow, SystemCursorIcon, Window, WindowPlugin},
     winit::cursor::CursorIcon,
     DefaultPlugins,
@@ -39,7 +38,7 @@ pub fn main() {
             }),
             ..Default::default()
         }))
-        .add_plugins(FrameTimeDiagnosticsPlugin)
+        .add_plugins(FrameTimeDiagnosticsPlugin::default())
         .add_systems(Startup, init)
         .add_systems(Update, picking_cursor)
         // This disables raycast backend.
@@ -113,7 +112,7 @@ pub fn picking_cursor(
     window: Query<Entity, With<PrimaryWindow>>,
     mut query: Query<(&PickingInteraction, &MeshMaterial3d<StandardMaterial>)>,
 ) {
-    let Ok(window) = window.get_single() else {
+    let Ok(window) = window.single() else {
         return;
     };
 

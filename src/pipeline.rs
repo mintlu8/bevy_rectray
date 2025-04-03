@@ -1,13 +1,18 @@
 use std::mem;
 
-use bevy::ecs::{
-    entity::Entity,
-    system::{Local, Query},
-};
-use bevy::hierarchy::Children;
+use bevy::ecs::hierarchy::Children;
 use bevy::transform::components::Transform;
+use bevy::{
+    ecs::{
+        change_detection::DetectChanges,
+        entity::Entity,
+        system::{Local, Query, Res},
+        world::Ref,
+    },
+    math::{Quat, StableInterpolate},
+    time::{Time, Virtual},
+};
 
-use crate::rect::Transform2;
 use crate::OutOfFrameBehavior;
 use crate::{
     hierarchy::RectrayFrame,
@@ -15,6 +20,7 @@ use crate::{
     rect::{ParentInfo, RotatedRect},
     transform::{Dimension, Transform2D},
 };
+use crate::{rect::Transform2, transform::InterpolateTransform};
 
 type REntity<'t> = (
     Entity,
@@ -24,16 +30,28 @@ type REntity<'t> = (
     &'t LayoutControl,
 );
 
+fn exp_decay_interpolate(transform: &mut Transform, target: Transform, fac: f32, dt: f32) {
+    transform
+        .translation
+        .smooth_nudge(&target.translation, fac, dt);
+    transform.scale.smooth_nudge(&target.scale, fac, dt);
+    let mut angle = transform.rotation.to_axis_angle().1;
+    let to = target.rotation.to_axis_angle().1;
+    angle.smooth_nudge(&to, fac, dt);
+    transform.rotation = Quat::from_rotation_z(angle);
+}
+
 #[allow(clippy::too_many_arguments)]
 #[allow(clippy::needless_pass_by_ref_mut)]
 fn propagate(
     parent: ParentInfo,
     entity: Entity,
+    dt: f32,
     mut_query: &mut Query<REntity>,
     layout_query: &mut Query<&mut Container>,
     child_query: &Query<&Children>,
     queue: &mut Vec<(Entity, ParentInfo)>,
-    transform_query: &mut Query<(&mut Transform, &mut RotatedRect)>,
+    transform_query: &mut Query<(&mut Transform, &mut RotatedRect, Ref<InterpolateTransform>)>,
 ) {
     if !mut_query.contains(entity) {
         return;
@@ -105,9 +123,16 @@ fn propagate(
                 .into_iter()
                 .map(|(e, anc)| (e, info.with_anchor(anc))),
         );
-        if let Ok((mut t, mut r)) = transform_query.get_mut(entity) {
+        if let Ok((mut t, mut r, interpolate)) = transform_query.get_mut(entity) {
             *r = rect.under_transform2(parent.affine);
-            *t = rect.transform_at(transform.get_center());
+            let result = rect.transform_at(transform.get_center());
+            match &*interpolate {
+                _ if interpolate.is_changed() => *t = result,
+                InterpolateTransform::None => *t = result,
+                InterpolateTransform::ExponentialDecay(fac) => {
+                    exp_decay_interpolate(&mut t, result, *fac, dt);
+                }
+            }
         }
         for (child, _) in other_entities {
             queue.push((child, info))
@@ -125,9 +150,9 @@ fn propagate(
             frame_space_rect.nudge_inside_ext(parent.frame_rect, &mut rect.center);
             rect
         }
-        OutOfFrameBehavior::FlexAnchor { .. } => {
+        OutOfFrameBehavior::AnchorSwap { .. } => {
             let mut result = RotatedRect::construct(&parent, transform, dimension, parent.frame);
-            for anchor in behavior.iter_flex_anchor() {
+            for anchor in behavior.iter_anchor_swaps() {
                 let rect = RotatedRect::construct2(
                     &parent,
                     transform,
@@ -139,6 +164,7 @@ fn propagate(
                 let frame_space_rect = rect.under_transform2(parent.affine);
                 if frame_space_rect.is_inside(parent.frame_rect) {
                     result = rect;
+                    break;
                 }
             }
             result
@@ -161,9 +187,16 @@ fn propagate(
         }
     }
 
-    if let Ok((mut t, mut r)) = transform_query.get_mut(entity) {
-        *t = rect.transform_at(transform.get_center());
+    if let Ok((mut t, mut r, interpolate)) = transform_query.get_mut(entity) {
         *r = rect.under_transform2(parent.affine);
+        let result = rect.transform_at(transform.get_center());
+        match &*interpolate {
+            _ if interpolate.is_changed() => *t = result,
+            InterpolateTransform::None => *t = result,
+            InterpolateTransform::ExponentialDecay(fac) => {
+                exp_decay_interpolate(&mut t, result, *fac, dt);
+            }
+        }
     }
 }
 
@@ -171,12 +204,14 @@ fn propagate(
 pub fn compute_transform_2d(
     mut queue_a: Local<Vec<(Entity, ParentInfo)>>,
     mut queue_b: Local<Vec<(Entity, ParentInfo)>>,
+    time: Res<Time<Virtual>>,
     root_query: Query<(Entity, &RectrayFrame, &Children)>,
     mut entity_query: Query<REntity>,
     mut layout_query: Query<&mut Container>,
     child_query: Query<&Children>,
-    mut transform_query: Query<(&mut Transform, &mut RotatedRect)>,
+    mut transform_query: Query<(&mut Transform, &mut RotatedRect, Ref<InterpolateTransform>)>,
 ) {
+    let dt = time.delta_secs();
     for (frame, root, children) in root_query.iter() {
         for child in children.iter().copied() {
             queue_a.push((
@@ -199,6 +234,7 @@ pub fn compute_transform_2d(
             propagate(
                 parent,
                 entity,
+                dt,
                 &mut entity_query,
                 &mut layout_query,
                 &child_query,

@@ -37,7 +37,7 @@ impl Anchor {
     }
 
     pub fn is_inherit(&self) -> bool {
-        self.0.is_nan()
+        self.0.x.is_nan()
     }
 
     pub const fn as_vec(&self) -> Vec2 {

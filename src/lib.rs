@@ -90,7 +90,8 @@
 //!
 
 use bevy::app::{App, Plugin, PostUpdate, PreUpdate};
-use bevy::ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
+use bevy::ecs::schedule::SystemSet;
+use bevy::prelude::IntoScheduleConfigs;
 use bevy::transform::TransformSystem;
 use layout::{Container, LayoutControl};
 
@@ -112,9 +113,9 @@ pub use picking::RectrayPickable;
 pub use pipeline::compute_transform_2d;
 pub use rect::{Anchor, RotatedRect};
 pub use tooltip::{AnchorDirection, OutOfFrameBehavior};
-pub use transform::{Dimension, SyncDimension, Transform2D};
+pub use transform::{Dimension, InterpolateTransform, SyncDimension, Transform2D};
 use window::window_frame_system;
-pub use window::RectrayWindow;
+pub use window::{RectrayCursor, RectrayWindow};
 
 /// [`Plugin`] for `bevy_rectray`.
 #[derive(Debug, Clone, Copy)]

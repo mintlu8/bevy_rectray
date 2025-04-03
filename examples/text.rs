@@ -3,12 +3,11 @@ use std::iter::repeat;
 use bevy::app::{App, Startup};
 use bevy::app::{PluginGroup, Update};
 use bevy::ecs::system::{Commands, Query};
-use bevy::hierarchy::BuildChildren;
 use bevy::math::Vec2;
 use bevy::{
     color::palettes::css::GOLD,
     diagnostic::FrameTimeDiagnosticsPlugin,
-    prelude::{Camera2d, ChildBuild, Visibility},
+    prelude::{Camera2d, Visibility},
     text::{Text2d, TextColor, TextFont, TextLayoutInfo},
     window::{Window, WindowPlugin},
     DefaultPlugins,
@@ -30,7 +29,7 @@ pub fn main() {
             }),
             ..Default::default()
         }))
-        .add_plugins(FrameTimeDiagnosticsPlugin)
+        .add_plugins(FrameTimeDiagnosticsPlugin::default())
         .add_systems(Startup, init)
         .add_systems(Update, sync_size)
         .add_plugins(RectrayPlugin)

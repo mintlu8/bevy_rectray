@@ -3,7 +3,6 @@ use std::collections::HashSet;
 use bevy::app::PluginGroup;
 use bevy::app::{App, Startup};
 use bevy::ecs::system::{Commands, ResMut};
-use bevy::hierarchy::BuildChildren;
 use bevy::math::{
     primitives::{Cuboid, Cylinder, Plane3d, Sphere, Torus},
     Vec2, Vec3,
@@ -15,7 +14,7 @@ use bevy::{
     diagnostic::FrameTimeDiagnosticsPlugin,
     image::Image,
     pbr::{AmbientLight, DirectionalLight, MeshMaterial3d, StandardMaterial},
-    prelude::{Camera3d, ChildBuild, Mesh3d},
+    prelude::{Camera3d, Mesh3d},
     render::{
         mesh::{Mesh, Meshable},
         render_asset::RenderAssetUsages,
@@ -38,12 +37,13 @@ pub fn main() {
             }),
             ..Default::default()
         }))
-        .add_plugins(FrameTimeDiagnosticsPlugin)
+        .add_plugins(FrameTimeDiagnosticsPlugin::default())
         .add_systems(Startup, init)
         .add_plugins(RectrayPlugin)
         .insert_resource(AmbientLight {
             color: Color::WHITE,
             brightness: 1000.,
+            ..Default::default()
         })
         .run();
 }

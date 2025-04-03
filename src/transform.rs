@@ -14,7 +14,8 @@ use serde::{Deserialize, Serialize};
     Dimension,
     LayoutControl,
     RotatedRect,
-    OutOfFrameBehavior
+    OutOfFrameBehavior,
+    InterpolateTransform
 )]
 pub struct Transform2D {
     /// The anchor matched on the child side.
@@ -154,4 +155,24 @@ pub enum SyncDimension {
     /// Set the component's value from [`Dimension`]'s `y`,
     /// and proportional to its underlying image's aspect ratio.
     FromAspectDimensionY,
+}
+
+/// If set, changes in local [`Transform`] will be interpolated.
+///
+/// This is commonly used to animate list additions, deletions or swaps.
+///
+/// # Note
+///
+/// This does not apply to the first frame,
+/// to bypass this later, trigger change detection on [`InterpolateTransform`].
+///
+/// This does not affect the outputted [`RotatedRect`] or `bevy_rectray` based picking,
+/// but raycast based picking is affected by this.
+#[derive(Debug, Clone, Copy, PartialEq, Component, Default, Serialize, Deserialize, Reflect)]
+pub enum InterpolateTransform {
+    /// No interpolation.
+    #[default]
+    None,
+    /// Use exponential decay for interpolation.
+    ExponentialDecay(f32),
 }

@@ -41,7 +41,7 @@ pub struct RectrayPickable;
 pub fn rectray_picking_backend(
     map: Res<RayMap>,
     layers: Query<(Option<&RenderLayers>, &Camera)>,
-    frames: Query<&GlobalTransform, With<RectrayFrame>>,
+    frames: Query<(&GlobalTransform, &RectrayFrame)>,
     query: Query<(Entity, &RotatedRect, Option<&RenderLayers>), With<RectrayPickable>>,
     mut writer: EventWriter<PointerHits>,
 ) {
@@ -75,7 +75,10 @@ pub fn rectray_picking_backend(
                 continue;
             };
             let ray_hit = ray_hits.entry(frame).or_insert_with(|| {
-                let transform = frames.get(frame).ok()?;
+                let (transform, f) = frames.get(frame).ok()?;
+                if !f.pickable {
+                    return None;
+                }
                 let inv = inverses
                     .entry(frame)
                     .or_insert_with(|| transform.affine().inverse());
@@ -110,7 +113,7 @@ pub fn rectray_picking_backend(
             }
         }
         if !event.picks.is_empty() {
-            writer.send(event);
+            writer.write(event);
         }
     }
 }

@@ -36,14 +36,14 @@ impl AnchorDirection {
             AnchorDirection::L => Anchor::CENTER_LEFT,
             AnchorDirection::T => Anchor::TOP_CENTER,
             AnchorDirection::R => Anchor::CENTER_RIGHT,
-            AnchorDirection::BL => todo!(),
-            AnchorDirection::LB => todo!(),
-            AnchorDirection::BR => todo!(),
-            AnchorDirection::RB => todo!(),
-            AnchorDirection::TL => todo!(),
-            AnchorDirection::LT => todo!(),
-            AnchorDirection::TR => todo!(),
-            AnchorDirection::RT => todo!(),
+            AnchorDirection::BL => Anchor::BOTTOM_RIGHT,
+            AnchorDirection::LB => Anchor::TOP_LEFT,
+            AnchorDirection::BR => Anchor::BOTTOM_LEFT,
+            AnchorDirection::RB => Anchor::TOP_RIGHT,
+            AnchorDirection::TL => Anchor::TOP_RIGHT,
+            AnchorDirection::LT => Anchor::BOTTOM_LEFT,
+            AnchorDirection::TR => Anchor::TOP_LEFT,
+            AnchorDirection::RT => Anchor::BOTTOM_RIGHT,
         }
     }
 
@@ -53,14 +53,14 @@ impl AnchorDirection {
             AnchorDirection::L => Anchor::CENTER_RIGHT,
             AnchorDirection::T => Anchor::BOTTOM_CENTER,
             AnchorDirection::R => Anchor::CENTER_LEFT,
-            AnchorDirection::BL => todo!(),
-            AnchorDirection::LB => todo!(),
-            AnchorDirection::BR => todo!(),
-            AnchorDirection::RB => todo!(),
-            AnchorDirection::TL => todo!(),
-            AnchorDirection::LT => todo!(),
-            AnchorDirection::TR => todo!(),
-            AnchorDirection::RT => todo!(),
+            AnchorDirection::BL => Anchor::TOP_RIGHT,
+            AnchorDirection::LB => Anchor::TOP_RIGHT,
+            AnchorDirection::BR => Anchor::TOP_LEFT,
+            AnchorDirection::RB => Anchor::TOP_LEFT,
+            AnchorDirection::TL => Anchor::BOTTOM_RIGHT,
+            AnchorDirection::LT => Anchor::BOTTOM_RIGHT,
+            AnchorDirection::TR => Anchor::BOTTOM_LEFT,
+            AnchorDirection::RT => Anchor::BOTTOM_LEFT,
         }
     }
 }
@@ -81,29 +81,29 @@ pub enum OutOfFrameBehavior {
     Nudge,
     /// Changes the combination of `anchor` and `parent_anchor` until in screen,
     /// if all choices failed, use `Transform2d`.
-    FlexAnchor {
+    AnchorSwap {
         choices: [AnchorDirection; 4],
         len: u8,
     },
 }
 
 impl OutOfFrameBehavior {
-    pub const fn flex_anchor(directions: &[AnchorDirection]) -> Self {
+    pub const fn anchor_swap(directions: &[AnchorDirection]) -> Self {
         let mut arr = [AnchorDirection::B; 4];
         let mut i = 0;
         while i < 4 && i < directions.len() {
             arr[i] = directions[i];
             i += 1;
         }
-        OutOfFrameBehavior::FlexAnchor {
+        OutOfFrameBehavior::AnchorSwap {
             choices: arr,
             len: i as u8,
         }
     }
 
-    pub fn iter_flex_anchor(&self) -> &[AnchorDirection] {
+    pub fn iter_anchor_swaps(&self) -> &[AnchorDirection] {
         match self {
-            OutOfFrameBehavior::FlexAnchor { choices, len } => &choices[0..*len as usize],
+            OutOfFrameBehavior::AnchorSwap { choices, len } => &choices[0..*len as usize],
             _ => &[],
         }
     }

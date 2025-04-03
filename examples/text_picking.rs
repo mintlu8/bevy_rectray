@@ -4,14 +4,13 @@ use bevy::ecs::{
     query::With,
     system::{Commands, Query},
 };
-use bevy::hierarchy::BuildChildren;
 use bevy::math::Vec2;
-use bevy::picking::focus::PickingInteraction;
+use bevy::picking::hover::PickingInteraction;
 use bevy::prelude::Entity;
 use bevy::{
     color::palettes::{basic::AQUA, css::GOLD},
     diagnostic::FrameTimeDiagnosticsPlugin,
-    prelude::{Camera2d, ChildBuild, Visibility},
+    prelude::{Camera2d, Visibility},
     text::{Text2d, TextColor, TextFont, TextLayoutInfo},
     window::{PrimaryWindow, SystemCursorIcon, Window, WindowPlugin},
     winit::cursor::CursorIcon,
@@ -33,7 +32,7 @@ pub fn main() {
             }),
             ..Default::default()
         }))
-        .add_plugins(FrameTimeDiagnosticsPlugin)
+        .add_plugins(FrameTimeDiagnosticsPlugin::default())
         .add_systems(Startup, init)
         .add_systems(Update, sync_size)
         .add_systems(Update, picking_cursor)
@@ -100,7 +99,7 @@ pub fn picking_cursor(
     window: Query<Entity, With<PrimaryWindow>>,
     mut query: Query<(&PickingInteraction, &mut TextColor)>,
 ) {
-    let Ok(window) = window.get_single() else {
+    let Ok(window) = window.single() else {
         return;
     };
 

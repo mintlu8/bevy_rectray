@@ -1,12 +1,13 @@
 use bevy::app::PluginGroup;
 use bevy::app::{App, Startup};
+use bevy::ecs::hierarchy::ChildOf;
+use bevy::ecs::relationship::RelatedSpawnerCommands;
 use bevy::ecs::system::Commands;
-use bevy::hierarchy::{BuildChildren, ChildBuilder};
 use bevy::math::Vec2;
 use bevy::{
     color::Color,
     diagnostic::FrameTimeDiagnosticsPlugin,
-    prelude::{Camera2d, ChildBuild},
+    prelude::Camera2d,
     sprite::Sprite,
     window::{Window, WindowPlugin},
     DefaultPlugins,
@@ -22,7 +23,7 @@ pub fn main() {
             }),
             ..Default::default()
         }))
-        .add_plugins(FrameTimeDiagnosticsPlugin)
+        .add_plugins(FrameTimeDiagnosticsPlugin::default())
         .add_systems(Startup, init)
         .add_plugins(RectrayPlugin)
         .run();
@@ -61,7 +62,7 @@ pub fn init(mut commands: Commands) {
         });
 }
 
-fn build_one(builder: &mut ChildBuilder, color: Color, anchor: Anchor) {
+fn build_one(builder: &mut RelatedSpawnerCommands<ChildOf>, color: Color, anchor: Anchor) {
     builder
         .spawn((
             Sprite {
@@ -89,7 +90,7 @@ fn build_one(builder: &mut ChildBuilder, color: Color, anchor: Anchor) {
         });
 }
 
-fn build_two(builder: &mut ChildBuilder, color: Color, anchor: Anchor) {
+fn build_two(builder: &mut RelatedSpawnerCommands<ChildOf>, color: Color, anchor: Anchor) {
     builder.spawn((
         Sprite {
             color,

@@ -1,5 +1,6 @@
 use bevy::{
     ecs::{query::With, system::Query},
+    math::Vec2,
     prelude::{
         Component, Reflect, ReflectComponent, ReflectDefault, ReflectDeserialize, ReflectSerialize,
     },
@@ -24,7 +25,7 @@ pub fn window_frame_system(
     mut frames: Query<&mut RectrayFrame, With<RectrayWindow>>,
     mut cursors: Query<&mut Transform2D, With<RectrayCursor>>,
 ) {
-    let Ok(window) = windows.get_single() else {
+    let Ok(window) = windows.single() else {
         return;
     };
     let size = window.size();
@@ -33,7 +34,7 @@ pub fn window_frame_system(
     }
     if let Some(pos) = window.cursor_position() {
         for mut transform in &mut cursors {
-            transform.offset = pos;
+            transform.offset = (pos - size / 2.) * Vec2::new(1., -1.);
         }
     }
 }

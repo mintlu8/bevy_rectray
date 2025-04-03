@@ -3,12 +3,13 @@ use bevy::{
     asset::Assets,
     ecs::{
         change_detection::DetectChanges,
-        schedule::IntoSystemConfigs,
         system::{Query, Res},
     },
     image::Image,
+    image::{TextureAtlas, TextureAtlasLayout},
     math::Vec2,
-    sprite::{Sprite, TextureAtlas, TextureAtlasLayout},
+    prelude::IntoScheduleConfigs,
+    sprite::Sprite,
 };
 
 use crate::{compute_transform_2d, transform::SyncDimension, Dimension, RectrayTransformSet};

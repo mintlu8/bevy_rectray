@@ -1,14 +1,16 @@
-use std::collections::HashSet;
-
 use bevy::{
     asset::RenderAssetUsages,
     diagnostic::FrameTimeDiagnosticsPlugin,
+    picking::hover::PickingInteraction,
     prelude::*,
     render::render_resource::{Extent3d, TextureDimension, TextureFormat},
+    window::{PrimaryWindow, SystemCursorIcon},
+    winit::cursor::CursorIcon,
 };
 use bevy_rectray::{
-    layout::{Container, LayoutObject, SpanLayout, StackLayout},
-    Anchor, Dimension, RectrayFrame, RectrayPlugin, Transform2D,
+    layout::{Container, LayoutObject, StackLayout},
+    Anchor, Dimension, InterpolateTransform, RectrayFrame, RectrayPickable, RectrayPlugin,
+    Transform2D,
 };
 
 pub fn main() {
@@ -22,21 +24,10 @@ pub fn main() {
         }))
         .add_plugins(FrameTimeDiagnosticsPlugin::default())
         .add_systems(Startup, init)
+        .add_systems(Update, pick)
         .add_plugins(RectrayPlugin)
         .run();
 }
-
-static ANCHORS: [Anchor; 9] = [
-    Anchor::TOP_LEFT,
-    Anchor::TOP_CENTER,
-    Anchor::TOP_RIGHT,
-    Anchor::CENTER_LEFT,
-    Anchor::CENTER,
-    Anchor::CENTER_RIGHT,
-    Anchor::BOTTOM_LEFT,
-    Anchor::BOTTOM_CENTER,
-    Anchor::BOTTOM_RIGHT,
-];
 
 pub fn init(mut commands: Commands) {
     commands.spawn(Camera2d);
@@ -53,58 +44,54 @@ pub fn init(mut commands: Commands) {
                     Dimension(Vec2::new(250., 25.)),
                     Container {
                         layout: LayoutObject::new(StackLayout::HSTACK),
-                        margin: Vec2::new(1.0, 1.0),
+                        margin: Vec2::new(20.0, 20.0),
                         ..Default::default()
                     },
                     Visibility::Inherited,
                 ))
                 .with_children(|builder| {
-                    for i in HashSet::<usize>::from_iter(0usize..9usize) {
-                        let size = Vec2::new(fastrand::f32() * 25. + 5., 20.);
-                        builder.spawn((
-                            Sprite {
-                                color: Color::hsl(fastrand::f32() * 360., 0.8, 0.5),
-                                custom_size: Some(size),
-                                ..Default::default()
-                            },
-                            Transform2D {
-                                anchor: ANCHORS[i],
-                                ..Default::default()
-                            },
-                            Dimension(size),
-                        ));
-                    }
-                });
-
-            builder
-                .spawn((
-                    Sprite::default(),
-                    Transform2D::IDENTITY.with_offset(Vec2::new(0., 20.)),
-                    Dimension(Vec2::new(250., 25.)),
-                    Container {
-                        layout: LayoutObject::new(SpanLayout::HBOX),
-                        margin: Vec2::new(1.0, 1.0),
-                        ..Default::default()
-                    },
-                ))
-                .with_children(|builder| {
-                    for i in HashSet::<usize>::from_iter(0usize..9usize) {
-                        let size = Vec2::new(fastrand::f32() * 25. + 5., 20.);
-                        builder.spawn((
-                            Sprite {
-                                color: Color::hsl(fastrand::f32() * 360., 0.8, 0.5),
-                                custom_size: Some(size),
-                                ..Default::default()
-                            },
-                            Transform2D {
-                                anchor: ANCHORS[i],
-                                ..Default::default()
-                            },
-                            Dimension(size),
-                        ));
+                    for _ in 0..9 {
+                        let size = Vec2::new(fastrand::f32() * 80. + 5., 60.);
+                        builder
+                            .spawn((
+                                Sprite {
+                                    color: Color::hsl(fastrand::f32() * 360., 0.8, 0.5),
+                                    custom_size: Some(size),
+                                    ..Default::default()
+                                },
+                                Transform2D {
+                                    ..Default::default()
+                                },
+                                Dimension(size),
+                                RectrayPickable,
+                                PickingInteraction::None,
+                                InterpolateTransform::ExponentialDecay(5.),
+                            ))
+                            .observe(
+                                |trigger: Trigger<Pointer<Pressed>>, mut commands: Commands| {
+                                    println!("Entity {:?} goes BOOM!", trigger.target());
+                                    commands.entity(trigger.target()).despawn();
+                                },
+                            );
                     }
                 });
         });
+}
+
+pub fn pick(
+    mut window: Query<&mut CursorIcon, With<PrimaryWindow>>,
+    query: Query<&PickingInteraction, Changed<PickingInteraction>>,
+) {
+    let Ok(mut icon) = window.single_mut() else {
+        return;
+    };
+    for interaction in &query {
+        if *interaction != PickingInteraction::Pressed {
+            *icon = CursorIcon::System(SystemCursorIcon::Grab);
+            return;
+        }
+    }
+    *icon = CursorIcon::System(SystemCursorIcon::Default);
 }
 
 fn random_mesh(value: u32) -> Mesh {
