@@ -1,5 +1,4 @@
-use std::collections::HashSet;
-
+#![allow(clippy::needless_range_loop)]
 use bevy::{
     asset::RenderAssetUsages,
     diagnostic::FrameTimeDiagnosticsPlugin,
@@ -7,7 +6,7 @@ use bevy::{
     render::render_resource::{Extent3d, TextureDimension, TextureFormat},
 };
 use bevy_rectray::{
-    layout::{Container, LayoutObject, SpanLayout, StackLayout},
+    layout::{Container, LayoutObject, SpanLayout, StackLayout, Y},
     Anchor, Dimension, RectrayFrame, RectrayPlugin, Transform2D,
 };
 
@@ -59,11 +58,11 @@ pub fn init(mut commands: Commands) {
                     Visibility::Inherited,
                 ))
                 .with_children(|builder| {
-                    for i in HashSet::<usize>::from_iter(0usize..9usize) {
+                    for i in 0..9 {
                         let size = Vec2::new(fastrand::f32() * 25. + 5., 20.);
                         builder.spawn((
                             Sprite {
-                                color: Color::hsl(fastrand::f32() * 360., 0.8, 0.5),
+                                color: Color::hsl(i as f32 * 20., 0.8, 0.5),
                                 custom_size: Some(size),
                                 ..Default::default()
                             },
@@ -88,16 +87,72 @@ pub fn init(mut commands: Commands) {
                     },
                 ))
                 .with_children(|builder| {
-                    for i in HashSet::<usize>::from_iter(0usize..9usize) {
+                    for i in 0..9 {
                         let size = Vec2::new(fastrand::f32() * 25. + 5., 20.);
                         builder.spawn((
                             Sprite {
-                                color: Color::hsl(fastrand::f32() * 360., 0.8, 0.5),
+                                color: Color::hsl(i as f32 * 20., 0.8, 0.5),
                                 custom_size: Some(size),
                                 ..Default::default()
                             },
                             Transform2D {
                                 anchor: ANCHORS[i],
+                                ..Default::default()
+                            },
+                            Dimension(size),
+                        ));
+                    }
+                });
+
+            builder
+                .spawn((
+                    Transform2D::IDENTITY.with_offset(Vec2::new(200., 0.)),
+                    Dimension(Vec2::new(25., 500.)),
+                    Container {
+                        layout: LayoutObject::new(SpanLayout::VBOX),
+                        margin: Vec2::new(1.0, 1.0),
+                        ..Default::default()
+                    },
+                ))
+                .with_children(|builder| {
+                    for i in 0..9 {
+                        let size = Vec2::new(fastrand::f32() * 25. + 5., 20.);
+                        builder.spawn((
+                            Sprite {
+                                color: Color::hsl(i as f32 * 20., 0.8, 0.5),
+                                custom_size: Some(size),
+                                ..Default::default()
+                            },
+                            Transform2D {
+                                anchor: Anchor::TOP_CENTER,
+                                ..Default::default()
+                            },
+                            Dimension(size),
+                        ));
+                    }
+                });
+
+            builder
+                .spawn((
+                    Transform2D::IDENTITY.with_offset(Vec2::new(300., 0.)),
+                    Dimension(Vec2::new(25., 500.)),
+                    Container {
+                        layout: LayoutObject::new(SpanLayout::<Y>::new()),
+                        margin: Vec2::new(1.0, 1.0),
+                        ..Default::default()
+                    },
+                ))
+                .with_children(|builder| {
+                    for i in 0..9 {
+                        let size = Vec2::new(fastrand::f32() * 25. + 5., 20.);
+                        builder.spawn((
+                            Sprite {
+                                color: Color::hsl(i as f32 * 20., 0.8, 0.5),
+                                custom_size: Some(size),
+                                ..Default::default()
+                            },
+                            Transform2D {
+                                anchor: Anchor::TOP_CENTER,
                                 ..Default::default()
                             },
                             Dimension(size),

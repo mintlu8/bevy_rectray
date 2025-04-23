@@ -35,9 +35,7 @@ pub enum Y {}
 
 /// Reverse a direction.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Reflect)]
-pub enum Rev<T> {
-    _Phantom(PhantomData<T>, X),
-}
+pub struct Rev<T>(PhantomData<T>, X);
 
 impl Direction for X {
     type Pos = Self;
@@ -175,11 +173,7 @@ impl<T: Direction> Direction for Rev<T> {
     }
 
     fn bucket(anc: Vec2) -> Trinary {
-        match T::bucket(anc) {
-            Trinary::Neg => Trinary::Pos,
-            Trinary::Mid => Trinary::Mid,
-            Trinary::Pos => Trinary::Neg,
-        }
+        T::bucket(anc)
     }
 }
 
