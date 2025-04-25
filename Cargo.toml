@@ -14,8 +14,9 @@ A minimal 2d layout system for bevy.
 keywords = ["bevy", "layout", "ui"]
 
 [features]
-default = ["2d"]
+default = ["2d", "window"]
 2d = ["bevy/bevy_sprite"]
+window = ["bevy/bevy_window"]
 
 [dependencies]
 bevy = { version = "0.16.0", default-features = false, features = ["bevy_picking", "bevy_render"]}

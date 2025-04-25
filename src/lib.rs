@@ -106,6 +106,7 @@ mod rect;
 mod sync_sprite;
 mod tooltip;
 mod transform;
+#[cfg(feature = "window")]
 mod window;
 
 pub use hierarchy::*;
@@ -115,7 +116,7 @@ pub use pipeline::compute_transform_2d;
 pub use rect::{Anchor, RotatedRect};
 pub use tooltip::{AnchorDirection, OutOfFrameBehavior};
 pub use transform::{Dimension, InterpolateTransform, SyncDimension, Transform2D};
-use window::window_frame_system;
+#[cfg(feature = "window")]
 pub use window::{RectrayCursor, RectrayWindow};
 
 /// [`Plugin`] for `bevy_rectray`.
@@ -140,9 +141,10 @@ impl Plugin for RectrayPlugin {
         );
         app.add_systems(PreUpdate, rectray_picking_backend.in_set(PickSet::Backend));
         app.add_systems(PostUpdate, compute_transform_2d.in_set(RectrayTransformSet));
+        #[cfg(feature = "window")]
         app.add_systems(
             PostUpdate,
-            window_frame_system
+            window::window_frame_system
                 .in_set(RectrayTransformSet)
                 .before(compute_transform_2d),
         );

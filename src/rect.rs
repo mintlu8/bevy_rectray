@@ -132,6 +132,7 @@ pub struct RotatedRect {
     pub z: f32,
     /// Scale of the rect.
     pub scale: Vec2,
+    #[serde(skip)]
     /// Entity of the frame.
     pub frame_entity: Option<Entity>,
 }
