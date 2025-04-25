@@ -18,11 +18,11 @@ default = ["2d"]
 2d = ["bevy/bevy_sprite"]
 
 [dependencies]
-bevy = { version = "0.16.0-rc.3", default-features = false, features = ["bevy_picking", "bevy_render"]}
+bevy = { version = "0.16.0", default-features = false, features = ["bevy_picking", "bevy_render"]}
 downcast-rs = "1.2.1"
 serde = { version = "1.0.204", features = ["derive"] }
 
 [dev-dependencies]
-bevy = "0.16.0-rc.3"
+bevy = "0.16.0"
 fastrand = "2.1.0"
 itertools = "0.13.0"
