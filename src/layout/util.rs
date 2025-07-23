@@ -181,6 +181,10 @@ impl DirectionPair for (X, Y) {}
 impl DirectionPair for (Rev<X>, Y) {}
 impl DirectionPair for (X, Rev<Y>) {}
 impl DirectionPair for (Rev<X>, Rev<Y>) {}
+impl DirectionPair for (Y, X) {}
+impl DirectionPair for (Rev<Y>, X) {}
+impl DirectionPair for (Y, Rev<X>) {}
+impl DirectionPair for (Rev<Y>, Rev<X>) {}
 
 /// Direction and stretch of a layout.
 pub trait StretchDir: Direction {

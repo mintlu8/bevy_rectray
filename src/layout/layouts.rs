@@ -212,7 +212,7 @@ impl Layout for BoundsLayout {
 }
 
 /// A size agnostic mono-directional container.
-#[derive(Debug, Default, Reflect)]
+#[derive(Debug, Reflect)]
 pub struct StackLayout<D: Direction = X>(#[reflect(ignore)] PhantomData<D>);
 
 impl<D: Direction> Copy for StackLayout<D> {}
@@ -229,6 +229,12 @@ impl StackLayout {
     pub const VSTACK: StackLayout<Rev<Y>> = StackLayout(PhantomData);
 }
 
+impl<D: Direction> Default for StackLayout<D> {
+    fn default() -> Self {
+        StackLayout(PhantomData)
+    }
+}
+
 impl<D: Direction> StackLayout<D> {
     pub fn new() -> Self {
         StackLayout(PhantomData)
@@ -236,7 +242,7 @@ impl<D: Direction> StackLayout<D> {
 }
 
 /// A fix-sized mono-directional container.
-#[derive(Debug, Default, Reflect)]
+#[derive(Debug, Reflect)]
 pub struct SpanLayout<D: StretchDir = X>(#[reflect(ignore)] PhantomData<D>);
 
 impl<D: StretchDir> Copy for SpanLayout<D> {}
@@ -253,6 +259,12 @@ impl SpanLayout {
     pub const VBOX: SpanLayout<Rev<Y>> = SpanLayout(PhantomData);
 }
 
+impl<D: StretchDir> Default for SpanLayout<D> {
+    fn default() -> Self {
+        SpanLayout(PhantomData)
+    }
+}
+
 impl<D: StretchDir> SpanLayout<D> {
     pub fn new() -> Self {
         SpanLayout(PhantomData)
@@ -264,7 +276,7 @@ impl<D: StretchDir> SpanLayout<D> {
 }
 
 /// A multiline version of the `span` layout, similar to the layout of a paragraph.
-#[derive(Debug, Default, Reflect)]
+#[derive(Debug, Reflect)]
 pub struct ParagraphLayout<D1: StretchDir = X, D2: Direction = Rev<Y>>(
     #[reflect(ignore)] PhantomData<(D1, D2)>,
 )
@@ -284,6 +296,15 @@ where
 impl ParagraphLayout {
     /// A left to right, top to bottom paragraph, similar to the default layout of a webpage.
     pub const PARAGRAPH: Self = Self(PhantomData);
+}
+
+impl<D1: StretchDir, D2: Direction> Default for ParagraphLayout<D1, D2>
+where
+    (D1, D2): DirectionPair,
+{
+    fn default() -> Self {
+        Self(PhantomData)
+    }
 }
 
 impl<D1: StretchDir, D2: Direction> ParagraphLayout<D1, D2>

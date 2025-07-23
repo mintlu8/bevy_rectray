@@ -1,4 +1,4 @@
-use std::{iter::repeat, mem};
+use std::mem;
 
 use bevy::ecs::entity::Entity;
 use bevy::math::Vec2;
@@ -217,10 +217,9 @@ pub(crate) fn span<D: StretchDir>(
     let pos_offset = major_dim - pos_len;
     let mid_offset = (major_dim + neg_len - pos_len - mid_cursor) / 2.0;
 
-    let categories = repeat(Trinary::Neg)
-        .take(neg.len())
-        .chain(repeat(Trinary::Mid).take(mid.len()))
-        .chain(repeat(Trinary::Pos).take(pos.len()));
+    let categories = std::iter::repeat_n(Trinary::Neg, neg.len())
+        .chain(std::iter::repeat_n(Trinary::Mid, mid.len()))
+        .chain(std::iter::repeat_n(Trinary::Pos, pos.len()));
 
     for ((_, pos), category) in result.iter_mut().zip(categories) {
         match category {
