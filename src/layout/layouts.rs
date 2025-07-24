@@ -48,6 +48,16 @@ impl Default for LayoutObject {
     }
 }
 
+macro_rules! box_zst {
+    ($T: ty) => {
+        const {
+            let p = ::std::ptr::NonNull::<$T>::dangling();
+            let b: Box<$T> = unsafe { std::mem::transmute(p) };
+            b
+        }
+    };
+}
+
 impl LayoutObject {
     pub fn new(layout: impl Layout) -> Self {
         Self(Box::new(layout))
@@ -59,6 +69,36 @@ impl LayoutObject {
 
     pub fn downcast_mut<T: Layout>(&mut self) -> Option<&mut T> {
         self.0.as_any_mut().downcast_mut()
+    }
+
+    /// Dynamic sized layout that conforms to child size and adds [`Container::padding`](crate::layout::Container::padding) to it.
+    pub const PADDING: LayoutObject = LayoutObject(box_zst!(PaddingLayout));
+
+    /// A dynamic sized horizontal layout.
+    pub const HSTACK: LayoutObject = LayoutObject(box_zst!(StackLayout::<X>));
+    /// A dynamic sized vertical layout.
+    pub const VSTACK: LayoutObject = LayoutObject(box_zst!(StackLayout::<Rev<Y>>));
+
+    /// A fix sized horizontal layout.
+    pub const HBOX: LayoutObject = LayoutObject(box_zst!(SpanLayout::<X>));
+    /// A fix sized vertical layout.
+    pub const VBOX: LayoutObject = LayoutObject(box_zst!(SpanLayout::<Rev<Y>>));
+
+    /// A horizontal layout with line breaks.
+    pub const PARAGRAPH: LayoutObject = LayoutObject(box_zst!(ParagraphLayout::<X, Rev<Y>>));
+}
+
+#[cfg(test)]
+mod test {
+    use crate::layout::LayoutObject;
+
+    #[test]
+    fn test_unsafe_consts() {
+        let _a = LayoutObject::HBOX;
+        let _a = LayoutObject::VBOX;
+        let _a = LayoutObject::HSTACK;
+        let _a = LayoutObject::VSTACK;
+        let _a = LayoutObject::PARAGRAPH;
     }
 }
 
@@ -103,6 +143,37 @@ impl LayoutOutput {
     pub fn with_max(mut self, max: usize) -> Self {
         self.max_count = max;
         self
+    }
+}
+
+#[derive(Debug, Clone, Copy, Default, Reflect)]
+pub(crate) struct PaddingLayout;
+
+impl Layout for PaddingLayout {
+    fn place(
+        &self,
+        _: &LayoutInfo,
+        entities: Vec<LayoutItem>,
+        range: &mut LayoutRange,
+    ) -> LayoutOutput {
+        let mut dimension = Vec2::ZERO;
+        range.resolve(entities.len());
+        let entity_anchors: Vec<_> = entities[range.to_range(entities.len())]
+            .iter()
+            .map(|x| {
+                dimension = dimension.max(x.dimension);
+                (x.entity, x.anchor)
+            })
+            .collect();
+        LayoutOutput {
+            entity_anchors,
+            dimension,
+            max_count: entities.len(),
+        }
+    }
+
+    fn dyn_clone(&self) -> Box<dyn Layout> {
+        Box::new(*self)
     }
 }
 
