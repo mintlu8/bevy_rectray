@@ -13,19 +13,21 @@
 //! Add [`RectrayPickable`] and [`PickableBundle`](bevy_mod_picking::PickableBundle) to entities you want to be pickable, that's it!
 
 #![allow(clippy::type_complexity)]
-use bevy::ecs::{
-    component::Component,
-    entity::{Entity, EntityHashMap},
-    event::EventWriter,
-    query::With,
-    system::{Query, Res},
-};
 use bevy::math::{primitives::InfinitePlane3d, Vec2, Vec3Swizzles};
 use bevy::transform::components::GlobalTransform;
 use bevy::{
+    camera::visibility::RenderLayers,
+    ecs::{
+        component::Component,
+        entity::{Entity, EntityHashMap},
+        message::MessageWriter,
+        query::With,
+        system::{Query, Res},
+    },
+};
+use bevy::{
     picking::backend::{ray::RayMap, HitData, PointerHits},
     prelude::Camera,
-    render::view::RenderLayers,
 };
 
 use crate::{Dimension, RectrayFrame, RotatedRect, Transform2D};
@@ -43,7 +45,7 @@ pub fn rectray_picking_backend(
     layers: Query<(Option<&RenderLayers>, &Camera)>,
     frames: Query<(&GlobalTransform, &RectrayFrame)>,
     query: Query<(Entity, &RotatedRect, Option<&RenderLayers>), With<RectrayPickable>>,
-    mut writer: EventWriter<PointerHits>,
+    mut writer: MessageWriter<PointerHits>,
 ) {
     let mut inverses = EntityHashMap::default();
     for (ray_id, ray) in map.iter() {

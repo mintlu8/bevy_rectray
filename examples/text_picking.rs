@@ -7,13 +7,14 @@ use bevy::ecs::{
 use bevy::math::Vec2;
 use bevy::picking::hover::PickingInteraction;
 use bevy::prelude::Entity;
+use bevy::sprite::Text2d;
+use bevy::window::CursorIcon;
 use bevy::{
     color::palettes::{basic::AQUA, css::GOLD},
     diagnostic::FrameTimeDiagnosticsPlugin,
     prelude::{Camera2d, Visibility},
-    text::{Text2d, TextColor, TextFont, TextLayoutInfo},
+    text::{TextColor, TextFont, TextLayoutInfo},
     window::{PrimaryWindow, SystemCursorIcon, Window, WindowPlugin},
-    winit::cursor::CursorIcon,
     DefaultPlugins,
 };
 use bevy_rectray::{

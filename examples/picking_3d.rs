@@ -2,27 +2,26 @@ use std::f32::consts::PI;
 
 use bevy::app::{App, Startup};
 use bevy::app::{PluginGroup, Update};
+use bevy::camera::Camera;
 use bevy::ecs::{
     query::With,
     system::{Commands, Query, ResMut},
 };
 use bevy::math::{primitives::Cuboid, Vec2, Vec3};
+use bevy::mesh::{Mesh, Meshable};
 use bevy::picking::hover::PickingInteraction;
+use bevy::post_process::bloom::Bloom;
 use bevy::prelude::Entity;
-use bevy::render::{
-    camera::Camera,
-    mesh::{Mesh, Meshable},
-};
+use bevy::render::view::Hdr;
 use bevy::transform::components::Transform;
+use bevy::window::CursorIcon;
 use bevy::{
     asset::Assets,
     color::palettes::{basic::AQUA, css::GOLD},
-    core_pipeline::bloom::Bloom,
     diagnostic::FrameTimeDiagnosticsPlugin,
     pbr::{MeshMaterial3d, StandardMaterial},
     prelude::{Camera3d, Mesh3d, MeshPickingSettings, Visibility},
     window::{PrimaryWindow, SystemCursorIcon, Window, WindowPlugin},
-    winit::cursor::CursorIcon,
     DefaultPlugins,
 };
 use bevy_rectray::{Anchor, Dimension, RectrayFrame, RectrayPickable, RectrayPlugin, Transform2D};
@@ -57,11 +56,9 @@ pub fn init(
 ) {
     commands.spawn((
         Transform::from_xyz(10., 10., 10.).looking_at(Vec3::new(0., 1., 0.), Vec3::Y),
-        Camera {
-            hdr: true,
-            ..Default::default()
-        },
+        Camera::default(),
         Camera3d::default(),
+        Hdr,
         Bloom::NATURAL,
     ));
 

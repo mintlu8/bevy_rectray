@@ -4,11 +4,12 @@ use bevy::app::{App, Startup};
 use bevy::app::{PluginGroup, Update};
 use bevy::ecs::system::{Commands, Query};
 use bevy::math::Vec2;
+use bevy::sprite::Text2d;
 use bevy::{
     color::palettes::css::GOLD,
     diagnostic::FrameTimeDiagnosticsPlugin,
     prelude::{Camera2d, Visibility},
-    text::{Text2d, TextColor, TextFont, TextLayoutInfo},
+    text::{TextColor, TextFont, TextLayoutInfo},
     window::{Window, WindowPlugin},
     DefaultPlugins,
 };

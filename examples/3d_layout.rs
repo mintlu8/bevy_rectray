@@ -2,24 +2,23 @@ use std::collections::HashSet;
 
 use bevy::app::PluginGroup;
 use bevy::app::{App, Startup};
+use bevy::asset::RenderAssetUsages;
 use bevy::ecs::system::{Commands, ResMut};
+use bevy::light::{AmbientLight, DirectionalLight};
 use bevy::math::{
     primitives::{Cuboid, Cylinder, Plane3d, Sphere, Torus},
     Vec2, Vec3,
 };
+use bevy::mesh::{Mesh, Meshable};
 use bevy::transform::components::Transform;
 use bevy::{
     asset::Assets,
     color::Color,
     diagnostic::FrameTimeDiagnosticsPlugin,
     image::Image,
-    pbr::{AmbientLight, DirectionalLight, MeshMaterial3d, StandardMaterial},
+    pbr::{MeshMaterial3d, StandardMaterial},
     prelude::{Camera3d, Mesh3d},
-    render::{
-        mesh::{Mesh, Meshable},
-        render_asset::RenderAssetUsages,
-        render_resource::{Extent3d, TextureDimension, TextureFormat},
-    },
+    render::render_resource::{Extent3d, TextureDimension, TextureFormat},
     window::{Window, WindowPlugin},
     DefaultPlugins,
 };

@@ -91,9 +91,9 @@
 
 use bevy::app::{App, Plugin, PostUpdate, PreUpdate};
 use bevy::ecs::schedule::SystemSet;
-use bevy::picking::PickSet;
+use bevy::picking::PickingSystems;
 use bevy::prelude::IntoScheduleConfigs;
-use bevy::transform::TransformSystem;
+use bevy::transform::TransformSystems;
 use layout::{Container, LayoutControl};
 
 mod hierarchy;
@@ -137,9 +137,12 @@ impl Plugin for RectrayPlugin {
         app.register_type::<SyncDimension>();
         app.configure_sets(
             PostUpdate,
-            RectrayTransformSet.before(TransformSystem::TransformPropagate),
+            RectrayTransformSet.before(TransformSystems::Propagate),
         );
-        app.add_systems(PreUpdate, rectray_picking_backend.in_set(PickSet::Backend));
+        app.add_systems(
+            PreUpdate,
+            rectray_picking_backend.in_set(PickingSystems::Backend),
+        );
         app.add_systems(PostUpdate, compute_transform_2d.in_set(RectrayTransformSet));
         #[cfg(feature = "window")]
         app.add_systems(

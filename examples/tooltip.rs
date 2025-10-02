@@ -61,7 +61,7 @@ pub fn init(mut commands: Commands) {
                                     "Press 'space' to switch between nudge and anchor swap mode.",
                                 ),
                                 TextBounds::new(200., 100.),
-                                BevyAnchor::TopLeft,
+                                BevyAnchor::TOP_LEFT,
                                 TextColor(css::RED.into()),
                                 Transform2D {
                                     anchor: Anchor::TOP_LEFT,
@@ -74,7 +74,7 @@ pub fn init(mut commands: Commands) {
 }
 
 pub fn mode_switch(
-    mut events: EventReader<KeyboardInput>,
+    mut events: MessageReader<KeyboardInput>,
     mut cursor: Single<&mut Dimension, With<RectrayCursor>>,
     mut tooltip: Single<&mut OutOfFrameBehavior, With<Tooltip>>,
 ) {

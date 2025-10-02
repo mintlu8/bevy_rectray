@@ -4,8 +4,7 @@ use bevy::{
     picking::hover::PickingInteraction,
     prelude::*,
     render::render_resource::{Extent3d, TextureDimension, TextureFormat},
-    window::{PrimaryWindow, SystemCursorIcon},
-    winit::cursor::CursorIcon,
+    window::{CursorIcon, PrimaryWindow, SystemCursorIcon},
 };
 use bevy_rectray::{
     layout::{Container, LayoutObject, StackLayout},
@@ -67,12 +66,10 @@ pub fn init(mut commands: Commands) {
                                 PickingInteraction::None,
                                 InterpolateTransform::ExponentialDecay(5.),
                             ))
-                            .observe(
-                                |trigger: Trigger<Pointer<Pressed>>, mut commands: Commands| {
-                                    println!("Entity {:?} goes BOOM!", trigger.target());
-                                    commands.entity(trigger.target()).despawn();
-                                },
-                            );
+                            .observe(|trigger: On<Pointer<Press>>, mut commands: Commands| {
+                                println!("Entity {:?} goes BOOM!", trigger.event().entity);
+                                commands.entity(trigger.event().entity).despawn();
+                            });
                     }
                 });
         });
