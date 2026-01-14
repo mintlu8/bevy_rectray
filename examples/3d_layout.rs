@@ -4,7 +4,7 @@ use bevy::app::PluginGroup;
 use bevy::app::{App, Startup};
 use bevy::asset::RenderAssetUsages;
 use bevy::ecs::system::{Commands, ResMut};
-use bevy::light::{AmbientLight, DirectionalLight};
+use bevy::light::{DirectionalLight, GlobalAmbientLight};
 use bevy::math::{
     primitives::{Cuboid, Cylinder, Plane3d, Sphere, Torus},
     Vec2, Vec3,
@@ -39,7 +39,7 @@ pub fn main() {
         .add_plugins(FrameTimeDiagnosticsPlugin::default())
         .add_systems(Startup, init)
         .add_plugins(RectrayPlugin)
-        .insert_resource(AmbientLight {
+        .insert_resource(GlobalAmbientLight {
             color: Color::WHITE,
             brightness: 1000.,
             ..Default::default()
