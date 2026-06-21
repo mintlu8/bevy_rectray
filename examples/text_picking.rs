@@ -8,6 +8,7 @@ use bevy::math::Vec2;
 use bevy::picking::hover::PickingInteraction;
 use bevy::prelude::Entity;
 use bevy::sprite::Text2d;
+use bevy::text::FontSize;
 use bevy::window::CursorIcon;
 use bevy::{
     color::palettes::{basic::AQUA, css::GOLD},
@@ -67,7 +68,7 @@ pub fn init(mut commands: Commands) {
                             Text2d::new(word),
                             TextColor(GOLD.into()),
                             TextFont {
-                                font_size: 24.,
+                                font_size: FontSize::Px(24.),
                                 ..Default::default()
                             },
                             Transform2D {

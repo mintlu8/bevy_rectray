@@ -110,6 +110,7 @@ pub fn rectray_picking_backend(
                         depth,
                         position: Some(ray_hit),
                         normal: Some(forward.into()),
+                        extra: None,
                     },
                 ))
             }

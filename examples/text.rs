@@ -5,6 +5,7 @@ use bevy::app::{PluginGroup, Update};
 use bevy::ecs::system::{Commands, Query};
 use bevy::math::Vec2;
 use bevy::sprite::Text2d;
+use bevy::text::FontSize;
 use bevy::{
     color::palettes::css::GOLD,
     diagnostic::FrameTimeDiagnosticsPlugin,
@@ -62,7 +63,7 @@ pub fn init(mut commands: Commands) {
                             Text2d::new(word),
                             TextColor(GOLD.into()),
                             TextFont {
-                                font_size: 16.,
+                                font_size: FontSize::Px(16.),
                                 ..Default::default()
                             },
                             Transform2D {

@@ -1,6 +1,6 @@
 [package]
 name = "bevy_rectray"
-version = "0.5.0"
+version = "0.6.0"
 edition = "2021"
 
 authors = ["Mincong Lu <mintlux667@gmail.com>"]
@@ -19,11 +19,11 @@ default = ["2d", "window"]
 window = ["bevy/bevy_window"]
 
 [dependencies]
-bevy = { version = "0.18.0", default-features = false, features = ["bevy_picking", "bevy_camera"]}
+bevy = { version = "0.19.0", default-features = false, features = ["bevy_picking", "bevy_camera"]}
 downcast-rs = "1.2.1"
 serde = { version = "1.0.204", features = ["derive"] }
 
 [dev-dependencies]
-bevy = "0.18.0"
+bevy = "0.19.0"
 fastrand = "2.1.0"
 itertools = "0.13.0"

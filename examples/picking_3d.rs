@@ -2,7 +2,7 @@ use std::f32::consts::PI;
 
 use bevy::app::{App, Startup};
 use bevy::app::{PluginGroup, Update};
-use bevy::camera::Camera;
+use bevy::camera::{Camera, Hdr};
 use bevy::ecs::{
     query::With,
     system::{Commands, Query, ResMut},
@@ -12,7 +12,6 @@ use bevy::mesh::{Mesh, Meshable};
 use bevy::picking::hover::PickingInteraction;
 use bevy::post_process::bloom::Bloom;
 use bevy::prelude::Entity;
-use bevy::render::view::Hdr;
 use bevy::transform::components::Transform;
 use bevy::window::CursorIcon;
 use bevy::{
@@ -118,10 +117,14 @@ pub fn picking_cursor(
     for (inter, mat) in query.iter_mut() {
         match inter {
             PickingInteraction::None => {
-                let _ = mats.get_mut(mat).map(|x| x.base_color = (GOLD * 4.).into());
+                let _ = mats
+                    .get_mut(mat)
+                    .map(|mut x| x.base_color = (GOLD * 4.).into());
             }
             _ => {
-                let _ = mats.get_mut(mat).map(|x| x.base_color = (AQUA * 4.).into());
+                let _ = mats
+                    .get_mut(mat)
+                    .map(|mut x| x.base_color = (AQUA * 4.).into());
                 hovering = true;
             }
         }
