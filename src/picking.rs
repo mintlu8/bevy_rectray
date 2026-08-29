@@ -34,7 +34,10 @@ use crate::{Dimension, RectrayFrame, RotatedRect, Transform2D};
 
 /// Make an item pickable in the `bevy_rectray` backend.
 ///
-/// Note: alternatives like the raycast backend or the sprite backend might be more desireable in some cases.
+/// This is a 2d picking backend based on the plane of [`RectrayFrame`]
+/// and ignores [`InterpolateTransform`](crate::InterpolateTransform).
+/// If this behavior is not desired, do not add this component
+/// and use something else like raycast.
 #[derive(Debug, Component, Default, Clone, Copy, PartialEq, Eq)]
 #[require(Transform2D, Dimension)]
 pub struct RectrayPickable;

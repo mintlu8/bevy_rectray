@@ -314,3 +314,19 @@ fn nudge_aabb_with(output: &mut Vec2, aabb: Rect, bounds: Rect) {
         output.y -= aabb.max.y - bounds.max.y;
     }
 }
+
+#[cfg(feature = "a11y")]
+impl RotatedRect {
+    pub fn into_accesskit_rect(&self, frame: Vec2, scale_factor: f32) -> accesskit::Rect {
+        let hx = frame.x / 2.;
+        let hy = frame.y / 2.;
+        let hdx = self.dimension.x / 2.;
+        let hdy = self.dimension.y / 2.;
+        accesskit::Rect {
+            x0: ((self.center.x - hdx + hx) * scale_factor) as f64,
+            y0: ((hy - (self.center.y - hdy)) * scale_factor) as f64,
+            x1: ((self.center.x + hdx + hx) * scale_factor) as f64,
+            y1: ((hy - (self.center.y + hdy)) * scale_factor) as f64,
+        }
+    }
+}

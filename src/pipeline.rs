@@ -1,6 +1,8 @@
 use std::mem;
 
 use bevy::ecs::hierarchy::Children;
+#[cfg(feature = "a11y")]
+use bevy::ecs::query::With;
 use bevy::transform::components::Transform;
 use bevy::{
     ecs::{
@@ -52,6 +54,8 @@ fn propagate(
     child_query: &Query<&Children>,
     queue: &mut Vec<(Entity, ParentInfo)>,
     transform_query: &mut Query<(&mut Transform, &mut RotatedRect, Ref<InterpolateTransform>)>,
+    #[cfg(feature = "a11y")] a11y_query: &mut Query<&mut bevy::a11y::AccessibilityNode>,
+    #[cfg(feature = "a11y")] scale_factor: f32,
 ) {
     if !mut_query.contains(entity) {
         return;
@@ -133,6 +137,15 @@ fn propagate(
                     exp_decay_interpolate(&mut t, result, *fac, dt);
                 }
             }
+
+            #[cfg(feature = "a11y")]
+            if let Ok(mut node) = a11y_query.get_mut(entity) {
+                if rect.rotation == 0. {
+                    node.0.set_bounds(
+                        (*r).into_accesskit_rect(parent.frame_rect.size(), scale_factor),
+                    );
+                }
+            }
         }
         for (child, _) in other_entities {
             queue.push((child, info))
@@ -197,6 +210,14 @@ fn propagate(
                 exp_decay_interpolate(&mut t, result, *fac, dt);
             }
         }
+
+        #[cfg(feature = "a11y")]
+        if let Ok(mut node) = a11y_query.get_mut(entity) {
+            if rect.rotation == 0. {
+                node.0
+                    .set_bounds((*r).into_accesskit_rect(parent.frame_rect.size(), scale_factor));
+            }
+        }
     }
 }
 
@@ -210,6 +231,11 @@ pub fn compute_transform_2d(
     mut layout_query: Query<&mut Container>,
     child_query: Query<&Children>,
     mut transform_query: Query<(&mut Transform, &mut RotatedRect, Ref<InterpolateTransform>)>,
+    #[cfg(feature = "a11y")] mut a11y_query: Query<&mut bevy::a11y::AccessibilityNode>,
+    #[cfg(feature = "a11y")] main_window: Query<
+        &bevy::window::Window,
+        With<bevy::window::PrimaryWindow>,
+    >,
 ) {
     let dt = time.delta_secs();
     for (frame, root, children) in root_query.iter() {
@@ -228,6 +254,9 @@ pub fn compute_transform_2d(
         }
     }
 
+    #[cfg(feature = "a11y")]
+    let scale_factor = main_window.single().map(|x| x.scale_factor()).unwrap_or(1.);
+
     while !queue_a.is_empty() {
         mem::swap::<Vec<_>>(queue_a.as_mut(), queue_b.as_mut());
         for (entity, parent) in queue_b.drain(..) {
@@ -240,6 +269,10 @@ pub fn compute_transform_2d(
                 &child_query,
                 &mut queue_a,
                 &mut transform_query,
+                #[cfg(feature = "a11y")]
+                &mut a11y_query,
+                #[cfg(feature = "a11y")]
+                scale_factor,
             );
         }
     }
