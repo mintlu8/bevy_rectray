@@ -6,8 +6,8 @@ use bevy::{
     render::render_resource::{Extent3d, TextureDimension, TextureFormat},
 };
 use bevy_rectray::{
-    layout::{Container, LayoutObject, SpanLayout, StackLayout, Y},
     Anchor, Dimension, RectrayFrame, RectrayPlugin, Transform2D,
+    layout::{Container, LayoutObject, SpanLayout, StackLayout, Y},
 };
 
 pub fn main() {

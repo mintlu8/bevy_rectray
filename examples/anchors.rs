@@ -5,12 +5,12 @@ use bevy::ecs::relationship::RelatedSpawnerCommands;
 use bevy::ecs::system::Commands;
 use bevy::math::Vec2;
 use bevy::{
+    DefaultPlugins,
     color::Color,
     diagnostic::FrameTimeDiagnosticsPlugin,
     prelude::Camera2d,
     sprite::Sprite,
     window::{Window, WindowPlugin},
-    DefaultPlugins,
 };
 use bevy_rectray::{Anchor, Dimension, RectrayFrame, RectrayPlugin, Transform2D};
 

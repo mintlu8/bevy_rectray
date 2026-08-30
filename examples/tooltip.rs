@@ -2,7 +2,7 @@ use bevy::sprite::Anchor as BevyAnchor;
 use bevy::{
     color::palettes::css,
     diagnostic::FrameTimeDiagnosticsPlugin,
-    input::{keyboard::KeyboardInput, ButtonState},
+    input::{ButtonState, keyboard::KeyboardInput},
     prelude::*,
     text::TextBounds,
 };

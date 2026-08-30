@@ -7,7 +7,7 @@ use crate::layout::{
     Layout, LayoutControl, LayoutOutput, ParagraphLayout, SpanLayout, StackLayout,
 };
 
-use super::{util::*, LayoutInfo, LayoutRange};
+use super::{LayoutInfo, LayoutRange, util::*};
 
 impl<D: Direction> Layout for StackLayout<D> {
     fn place(

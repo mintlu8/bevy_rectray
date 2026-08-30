@@ -16,6 +16,7 @@ use bevy::{
 };
 
 use crate::OutOfFrameBehavior;
+use crate::transform::{ChangeState, RectrayChangeDetection};
 use crate::{
     hierarchy::RectrayFrame,
     layout::{Container, LayoutControl, LayoutInfo, LayoutItem, LayoutOutput},
@@ -30,6 +31,7 @@ type REntity<'t> = (
     &'t Transform2D,
     &'t OutOfFrameBehavior,
     &'t LayoutControl,
+    &'t RectrayChangeDetection,
 );
 
 fn exp_decay_interpolate(transform: &mut Transform, target: Transform, fac: f32, dt: f32) {
@@ -61,8 +63,14 @@ fn propagate(
         return;
     }
 
-    let Ok((entity, dim, transform, behavior, ..)) = mut_query.get(entity) else {
+    let Ok((entity, dim, transform, behavior, .., change)) = mut_query.get(entity) else {
         return;
+    };
+
+    let skip_output = match change.state {
+        ChangeState::Skip => return,
+        ChangeState::Changed => false,
+        ChangeState::Unchanged => true,
     };
 
     let dimension = dim.0;
@@ -80,7 +88,7 @@ fn propagate(
                 continue;
             }
 
-            if let Ok((_, child_dim, child_transform, .., control)) = mut_query.get(child) {
+            if let Ok((_, child_dim, child_transform, .., control, _)) = mut_query.get(child) {
                 match control {
                     LayoutControl::IgnoreLayout => {
                         other_entities.push((child, child_transform.get_parent_anchor()))
@@ -127,7 +135,7 @@ fn propagate(
                 .into_iter()
                 .map(|(e, anc)| (e, info.with_anchor(anc))),
         );
-        if let Ok((mut t, mut r, interpolate)) = transform_query.get_mut(entity) {
+        if !skip_output && let Ok((mut t, mut r, interpolate)) = transform_query.get_mut(entity) {
             *r = rect.under_transform2(parent.affine);
             let result = rect.transform_at(transform.get_center());
             match &*interpolate {
@@ -139,12 +147,11 @@ fn propagate(
             }
 
             #[cfg(feature = "a11y")]
-            if let Ok(mut node) = a11y_query.get_mut(entity) {
-                if rect.rotation == 0. {
-                    node.0.set_bounds(
-                        (*r).into_accesskit_rect(parent.frame_rect.size(), scale_factor),
-                    );
-                }
+            if let Ok(mut node) = a11y_query.get_mut(entity)
+                && rect.rotation == 0.
+            {
+                node.0
+                    .set_bounds((*r).into_accesskit_rect(parent.frame_rect.size(), scale_factor));
             }
         }
         for (child, _) in other_entities {
@@ -200,7 +207,7 @@ fn propagate(
         }
     }
 
-    if let Ok((mut t, mut r, interpolate)) = transform_query.get_mut(entity) {
+    if !skip_output && let Ok((mut t, mut r, interpolate)) = transform_query.get_mut(entity) {
         *r = rect.under_transform2(parent.affine);
         let result = rect.transform_at(transform.get_center());
         match &*interpolate {
@@ -212,11 +219,11 @@ fn propagate(
         }
 
         #[cfg(feature = "a11y")]
-        if let Ok(mut node) = a11y_query.get_mut(entity) {
-            if rect.rotation == 0. {
-                node.0
-                    .set_bounds((*r).into_accesskit_rect(parent.frame_rect.size(), scale_factor));
-            }
+        if let Ok(mut node) = a11y_query.get_mut(entity)
+            && rect.rotation == 0.
+        {
+            node.0
+                .set_bounds((*r).into_accesskit_rect(parent.frame_rect.size(), scale_factor));
         }
     }
 }
@@ -276,4 +283,93 @@ pub fn compute_transform_2d(
             );
         }
     }
+}
+
+pub fn mark_dirty(
+    root: Query<(Ref<RectrayFrame>, &Children)>,
+    mut query: Query<(
+        &mut RectrayChangeDetection,
+        Ref<Transform2D>,
+        Ref<Dimension>,
+        Ref<OutOfFrameBehavior>,
+        Option<Ref<Container>>,
+    )>,
+    children_query: Query<Ref<Children>>,
+) {
+    for (frame, children) in root.iter() {
+        for child in children.iter().copied() {
+            mark_dirty_on(child, frame.is_changed(), query.reborrow(), &children_query);
+        }
+    }
+}
+
+pub fn mark_dirty_on(
+    entity: Entity,
+    parent_is_dirty: bool,
+    mut query: Query<(
+        &mut RectrayChangeDetection,
+        Ref<Transform2D>,
+        Ref<Dimension>,
+        Ref<OutOfFrameBehavior>,
+        Option<Ref<Container>>,
+    )>,
+    children_query: &Query<Ref<Children>>,
+) -> bool {
+    let children = children_query.get(entity).ok();
+
+    let mut any_children_changed = false;
+
+    let Ok((_, transform, dimension, oofb, container)) = query.get_mut(entity) else {
+        return true;
+    };
+
+    let oofb_dirty = match *oofb {
+        OutOfFrameBehavior::None => false,
+        _ => parent_is_dirty,
+    };
+
+    let self_dirty = transform.is_changed()
+        || dimension.is_changed()
+        || oofb.is_changed()
+        || oofb_dirty
+        || container.is_some();
+
+    for child in children.iter().flatten().copied() {
+        any_children_changed |= mark_dirty_on(child, self_dirty, query.reborrow(), children_query);
+    }
+
+    let Ok((mut change_detection, transform, dimension, oofb, container)) = query.get_mut(entity)
+    else {
+        return true;
+    };
+
+    let children_component_changed = children.is_some_and(|x| x.is_changed())
+        || (children.is_none() && change_detection.had_children_before);
+
+    let container_changed = container
+        .is_some_and(|x| x.is_changed() || children_component_changed || any_children_changed);
+
+    let changed = transform.is_changed()
+        || dimension.is_changed()
+        || oofb.is_changed()
+        || oofb_dirty
+        || container_changed;
+
+    change_detection.had_children_before = children.is_some();
+    change_detection.state = if changed {
+        ChangeState::Changed
+    } else if any_children_changed {
+        ChangeState::Unchanged
+    } else {
+        ChangeState::Skip
+    };
+    if container.is_some() && changed {
+        for child in children.iter().flatten().copied() {
+            let Ok((mut change_detection, ..)) = query.get_mut(child) else {
+                continue;
+            };
+            change_detection.state = ChangeState::Changed
+        }
+    }
+    changed || any_children_changed
 }

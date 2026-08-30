@@ -4,11 +4,11 @@ use std::ops::Deref;
 
 use bevy::ecs::entity::Entity;
 use bevy::math::Vec2;
-use bevy::reflect::std_traits::ReflectDefault;
 use bevy::reflect::Reflect;
-use downcast_rs::{impl_downcast, Downcast};
+use bevy::reflect::std_traits::ReflectDefault;
+use downcast_rs::{Downcast, impl_downcast};
 
-use super::{util::*, LayoutInfo, LayoutRange};
+use super::{LayoutInfo, LayoutRange, util::*};
 
 // asserts layout is object safe
 const _: Option<Box<dyn Layout>> = None;

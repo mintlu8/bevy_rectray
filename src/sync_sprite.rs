@@ -12,7 +12,7 @@ use bevy::{
     sprite::Sprite,
 };
 
-use crate::{compute_transform_2d, transform::SyncDimension, Dimension, RectrayTransformSet};
+use crate::{Dimension, RectrayTransformSet, compute_transform_2d, transform::SyncDimension};
 
 fn get_atlas_size(
     handle: &Option<TextureAtlas>,

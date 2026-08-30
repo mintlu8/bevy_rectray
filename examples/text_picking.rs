@@ -11,16 +11,16 @@ use bevy::sprite::Text2d;
 use bevy::text::FontSize;
 use bevy::window::CursorIcon;
 use bevy::{
+    DefaultPlugins,
     color::palettes::{basic::AQUA, css::GOLD},
     diagnostic::FrameTimeDiagnosticsPlugin,
     prelude::{Camera2d, Visibility},
     text::{TextColor, TextFont, TextLayoutInfo},
     window::{PrimaryWindow, SystemCursorIcon, Window, WindowPlugin},
-    DefaultPlugins,
 };
 use bevy_rectray::{
-    layout::{Container, LayoutControl, LayoutObject, ParagraphLayout},
     Anchor, Dimension, RectrayFrame, RectrayPickable, RectrayPlugin, Transform2D,
+    layout::{Container, LayoutControl, LayoutObject, ParagraphLayout},
 };
 
 pub static LOREM_IPSUM: &str = r#"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent vehicula tortor sem, id egestas elit tincidunt eu. Etiam ante sem, accumsan ut felis fermentum, viverra lobortis nibh. Morbi neque lectus, venenatis vel luctus eu, ullamcorper et enim. In suscipit tempus nunc, sit amet sagittis ligula pharetra in. In lacinia felis in ullamcorper tempus. Praesent placerat ipsum dolor, et eleifend enim tincidunt eu. Duis laoreet, ante ut scelerisque eleifend, velit nulla mattis augue, id cursus dui enim et est. Fusce in nibh mauris. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tincidunt hendrerit sagittis. Suspendisse gravida quis purus a venenatis. Etiam ipsum velit, ultrices et auctor ac, pharetra vitae justo. Maecenas vulputate ligula et dui eleifend eleifend quis at neque. Integer facilisis enim ligula, eget scelerisque quam sodales non. Integer sed euismod massa. Nam auctor nec dolor ut condimentum."#;

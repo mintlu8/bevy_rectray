@@ -6,12 +6,13 @@ use bevy::asset::RenderAssetUsages;
 use bevy::ecs::system::{Commands, ResMut};
 use bevy::light::{DirectionalLight, GlobalAmbientLight};
 use bevy::math::{
-    primitives::{Cuboid, Cylinder, Plane3d, Sphere, Torus},
     Vec2, Vec3,
+    primitives::{Cuboid, Cylinder, Plane3d, Sphere, Torus},
 };
 use bevy::mesh::{Mesh, Meshable};
 use bevy::transform::components::Transform;
 use bevy::{
+    DefaultPlugins,
     asset::Assets,
     color::Color,
     diagnostic::FrameTimeDiagnosticsPlugin,
@@ -20,11 +21,10 @@ use bevy::{
     prelude::{Camera3d, Mesh3d},
     render::render_resource::{Extent3d, TextureDimension, TextureFormat},
     window::{Window, WindowPlugin},
-    DefaultPlugins,
 };
 use bevy_rectray::{
-    layout::{Container, LayoutObject, StackLayout},
     Anchor, Dimension, RectrayFrame, RectrayPlugin, Transform2D,
+    layout::{Container, LayoutObject, StackLayout},
 };
 
 pub fn main() {
