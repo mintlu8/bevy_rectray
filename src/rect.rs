@@ -3,7 +3,7 @@ use std::ops::{Mul, Neg};
 use bevy::ecs::entity::Entity;
 use bevy::ecs::{component::Component, reflect::ReflectComponent};
 use bevy::math::{Quat, Rect, Vec2};
-use bevy::reflect::{std_traits::ReflectDefault, Reflect, ReflectDeserialize, ReflectSerialize};
+use bevy::reflect::{Reflect, ReflectDeserialize, ReflectSerialize, std_traits::ReflectDefault};
 use bevy::transform::components::Transform;
 use serde::{Deserialize, Serialize};
 
@@ -57,11 +57,7 @@ impl Anchor {
     }
 
     pub fn or(self, other: Self) -> Self {
-        if self.is_inherit() {
-            other
-        } else {
-            self
-        }
+        if self.is_inherit() { other } else { self }
     }
 
     pub fn str_name(&self) -> &'static str {

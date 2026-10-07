@@ -13,7 +13,7 @@
 //! Add [`RectrayPickable`] and [`PickableBundle`](bevy_mod_picking::PickableBundle) to entities you want to be pickable, that's it!
 
 #![allow(clippy::type_complexity)]
-use bevy::math::{primitives::InfinitePlane3d, Vec2, Vec3Swizzles};
+use bevy::math::{Vec2, Vec3Swizzles, primitives::InfinitePlane3d};
 use bevy::transform::components::GlobalTransform;
 use bevy::{
     camera::visibility::RenderLayers,
@@ -26,7 +26,7 @@ use bevy::{
     },
 };
 use bevy::{
-    picking::backend::{ray::RayMap, HitData, PointerHits},
+    picking::backend::{HitData, PointerHits, ray::RayMap},
     prelude::Camera,
 };
 

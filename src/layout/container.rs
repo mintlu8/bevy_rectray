@@ -3,7 +3,7 @@ use std::ops::{Range, RangeFull, RangeInclusive};
 use bevy::ecs::{component::Component, reflect::ReflectComponent};
 use bevy::math::Vec2;
 use bevy::prelude::Visibility;
-use bevy::reflect::{std_traits::ReflectDefault, Reflect};
+use bevy::reflect::{Reflect, std_traits::ReflectDefault};
 
 use crate::Transform2D;
 

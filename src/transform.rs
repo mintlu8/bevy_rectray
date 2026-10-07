@@ -1,8 +1,9 @@
 use crate::{Anchor, LayoutControl, OutOfFrameBehavior, RotatedRect};
+use bevy::ecs::VariantDefaults;
 use bevy::ecs::{component::Component, reflect::ReflectComponent};
 use bevy::math::Vec2;
 use bevy::prelude::{Transform, Visibility};
-use bevy::reflect::{std_traits::ReflectDefault, Reflect, ReflectDeserialize, ReflectSerialize};
+use bevy::reflect::{Reflect, ReflectDeserialize, ReflectSerialize, std_traits::ReflectDefault};
 use serde::{Deserialize, Serialize};
 
 /// The 2D transform component for `bevy_rectray`.
@@ -15,7 +16,8 @@ use serde::{Deserialize, Serialize};
     LayoutControl,
     RotatedRect,
     OutOfFrameBehavior,
-    InterpolateTransform
+    InterpolateTransform,
+    RectrayChangeDetection
 )]
 pub struct Transform2D {
     /// The anchor matched on the child side.
@@ -134,7 +136,7 @@ impl Dimension {
 
 /// Synchronize [`Dimension`] from or to another component like [`Sprite`](bevy::prelude::Sprite).
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Component, Default, Serialize, Deserialize, Reflect,
+    Debug, Clone, Copy, PartialEq, Eq, Component, Default, Serialize, Deserialize, Reflect, VariantDefaults
 )]
 #[reflect(Component, Default, Serialize, Deserialize)]
 #[repr(u8)]
@@ -168,11 +170,28 @@ pub enum SyncDimension {
 ///
 /// This does not affect the outputted [`RotatedRect`] or `bevy_rectray` based picking,
 /// but raycast based picking is affected by this.
-#[derive(Debug, Clone, Copy, PartialEq, Component, Default, Serialize, Deserialize, Reflect)]
+#[derive(Debug, Clone, Copy, PartialEq, Component, Default, Serialize, Deserialize, Reflect, VariantDefaults)]
 pub enum InterpolateTransform {
     /// No interpolation.
     #[default]
     None,
     /// Use exponential decay for interpolation.
     ExponentialDecay(f32),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Component, Default, Serialize, Deserialize)]
+pub struct RectrayChangeDetection {
+    pub(crate) state: ChangeState,
+    pub(crate) had_children_before: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Component, Default, Serialize, Deserialize)]
+pub(crate) enum ChangeState {
+    /// Requires writing to [`Transform`].
+    #[default]
+    Changed,
+    /// Skip writing to [`Transform`], but at least one descendant need to write to [`Transform`].
+    Unchanged,
+    /// All descendants can safely skip writing to [`Transform`].
+    Skip,
 }

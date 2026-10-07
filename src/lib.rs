@@ -91,6 +91,7 @@
 
 use bevy::app::{App, Plugin, PostUpdate, PreUpdate};
 use bevy::ecs::schedule::SystemSet;
+use bevy::ecs::system::IntoSystem;
 use bevy::picking::PickingSystems;
 use bevy::prelude::IntoScheduleConfigs;
 use bevy::transform::TransformSystems;
@@ -110,8 +111,8 @@ mod transform;
 mod window;
 
 pub use hierarchy::*;
-use picking::rectray_picking_backend;
 pub use picking::RectrayPickable;
+use picking::rectray_picking_backend;
 pub use pipeline::compute_transform_2d;
 pub use rect::{Anchor, RotatedRect};
 pub use tooltip::{AnchorDirection, OutOfFrameBehavior};
@@ -143,7 +144,12 @@ impl Plugin for RectrayPlugin {
             PreUpdate,
             rectray_picking_backend.in_set(PickingSystems::Backend),
         );
-        app.add_systems(PostUpdate, compute_transform_2d.in_set(RectrayTransformSet));
+        app.add_systems(
+            PostUpdate,
+            mark_dirty
+                .pipe(compute_transform_2d)
+                .in_set(RectrayTransformSet),
+        );
         #[cfg(feature = "window")]
         app.add_systems(
             PostUpdate,
@@ -161,8 +167,8 @@ mod bundles {
     use bevy::prelude::Bundle;
 
     use crate::{
-        layout::{Container, LayoutControl},
         Dimension, RotatedRect, Transform2D,
+        layout::{Container, LayoutControl},
     };
 
     /// [`Bundle`] for `bevy_rectray`'s features, must be paired with a
@@ -200,3 +206,5 @@ mod bundles {
 
 #[allow(deprecated)]
 pub use bundles::{RectrayBundle, RectrayContainerBundle};
+
+use crate::pipeline::mark_dirty;

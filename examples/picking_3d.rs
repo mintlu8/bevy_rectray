@@ -7,7 +7,7 @@ use bevy::ecs::{
     query::With,
     system::{Commands, Query, ResMut},
 };
-use bevy::math::{primitives::Cuboid, Vec2, Vec3};
+use bevy::math::{Vec2, Vec3, primitives::Cuboid};
 use bevy::mesh::{Mesh, Meshable};
 use bevy::picking::hover::PickingInteraction;
 use bevy::post_process::bloom::Bloom;
@@ -15,13 +15,13 @@ use bevy::prelude::Entity;
 use bevy::transform::components::Transform;
 use bevy::window::CursorIcon;
 use bevy::{
+    DefaultPlugins,
     asset::Assets,
     color::palettes::{basic::AQUA, css::GOLD},
     diagnostic::FrameTimeDiagnosticsPlugin,
     pbr::{MeshMaterial3d, StandardMaterial},
     prelude::{Camera3d, Mesh3d, MeshPickingSettings, Visibility},
     window::{PrimaryWindow, SystemCursorIcon, Window, WindowPlugin},
-    DefaultPlugins,
 };
 use bevy_rectray::{Anchor, Dimension, RectrayFrame, RectrayPickable, RectrayPlugin, Transform2D};
 

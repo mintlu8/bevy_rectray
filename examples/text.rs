@@ -7,16 +7,16 @@ use bevy::math::Vec2;
 use bevy::sprite::Text2d;
 use bevy::text::FontSize;
 use bevy::{
+    DefaultPlugins,
     color::palettes::css::GOLD,
     diagnostic::FrameTimeDiagnosticsPlugin,
     prelude::{Camera2d, Visibility},
     text::{TextColor, TextFont, TextLayoutInfo},
     window::{Window, WindowPlugin},
-    DefaultPlugins,
 };
 use bevy_rectray::{
-    layout::{Container, LayoutControl, LayoutObject, ParagraphLayout},
     Anchor, Dimension, RectrayFrame, RectrayPlugin, Transform2D,
+    layout::{Container, LayoutControl, LayoutObject, ParagraphLayout},
 };
 use itertools::Itertools;
 
