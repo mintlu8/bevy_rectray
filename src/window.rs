@@ -13,6 +13,7 @@ use crate::{RectrayFrame, Transform2D};
 /// Synchronize the size of [`RectrayFrame`] with [`PrimaryWindow`].
 #[derive(Debug, Clone, Copy, Default, Reflect, Serialize, Deserialize, Component)]
 #[reflect(Default, Serialize, Deserialize, Component)]
+#[require(RectrayFrame)]
 pub struct RectrayWindow;
 
 /// Set [`Transform2D::offset`] to [`PrimaryWindow`]'s cursor position.

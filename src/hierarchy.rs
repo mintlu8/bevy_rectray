@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use crate::rect::Anchor;
 
 /// A root node that creates an area to place child entities.
-#[derive(Debug, Reflect, Component, Serialize, Deserialize)]
+#[derive(Debug, Clone, Reflect, Component, Serialize, Deserialize)]
 #[reflect(Component, Default, Serialize, Deserialize)]
 #[require(Transform, Visibility)]
 pub struct RectrayFrame {
