@@ -7,11 +7,12 @@ use bevy::ecs::{
     query::With,
     system::{Commands, Query, ResMut},
 };
-use bevy::math::{Vec2, Vec3, primitives::Cuboid};
+use bevy::math::{Vec2, Vec3};
 use bevy::mesh::{Mesh, Meshable};
 use bevy::picking::hover::PickingInteraction;
 use bevy::post_process::bloom::Bloom;
 use bevy::prelude::Entity;
+use bevy::shape::Cuboid;
 use bevy::transform::components::Transform;
 use bevy::window::CursorIcon;
 use bevy::{

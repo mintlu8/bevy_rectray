@@ -11,6 +11,10 @@ use serde::{Deserialize, Serialize};
 use crate::{RectrayFrame, Transform2D};
 
 /// Synchronize the size of [`RectrayFrame`] with [`PrimaryWindow`].
+///
+/// # Requires
+///
+/// * [`RectrayFrame`]
 #[derive(Debug, Clone, Copy, Default, Reflect, Serialize, Deserialize, Component)]
 #[reflect(Default, Serialize, Deserialize, Component)]
 #[require(RectrayFrame)]

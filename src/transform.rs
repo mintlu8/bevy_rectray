@@ -1,5 +1,4 @@
 use crate::{Anchor, LayoutControl, OutOfFrameBehavior, RotatedRect};
-use bevy::ecs::VariantDefaults;
 use bevy::ecs::{component::Component, reflect::ReflectComponent};
 use bevy::math::Vec2;
 use bevy::prelude::{Transform, Visibility};
@@ -132,11 +131,15 @@ pub struct Dimension(pub Vec2);
 
 impl Dimension {
     pub const ZERO: Dimension = Dimension(Vec2::ZERO);
+
+    pub const fn new(x: f32, y: f32) -> Self {
+        Dimension(Vec2 { x, y })
+    }
 }
 
 /// Synchronize [`Dimension`] from or to another component like [`Sprite`](bevy::prelude::Sprite).
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Component, Default, Serialize, Deserialize, Reflect, VariantDefaults
+    Debug, Clone, Copy, PartialEq, Eq, Component, Default, Serialize, Deserialize, Reflect,
 )]
 #[reflect(Component, Default, Serialize, Deserialize)]
 #[repr(u8)]
@@ -170,7 +173,7 @@ pub enum SyncDimension {
 ///
 /// This does not affect the outputted [`RotatedRect`] or `bevy_rectray` based picking,
 /// but raycast based picking is affected by this.
-#[derive(Debug, Clone, Copy, PartialEq, Component, Default, Serialize, Deserialize, Reflect, VariantDefaults)]
+#[derive(Debug, Clone, Copy, PartialEq, Component, Default, Serialize, Deserialize, Reflect)]
 pub enum InterpolateTransform {
     /// No interpolation.
     #[default]

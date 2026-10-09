@@ -5,11 +5,9 @@ use bevy::app::{App, Startup};
 use bevy::asset::RenderAssetUsages;
 use bevy::ecs::system::{Commands, ResMut};
 use bevy::light::{DirectionalLight, GlobalAmbientLight};
-use bevy::math::{
-    Vec2, Vec3,
-    primitives::{Cuboid, Cylinder, Plane3d, Sphere, Torus},
-};
+use bevy::math::{Vec2, Vec3};
 use bevy::mesh::{Mesh, Meshable};
+use bevy::shape::{Cuboid, Cylinder, Plane3d, Sphere, Torus};
 use bevy::transform::components::Transform;
 use bevy::{
     DefaultPlugins,

@@ -66,7 +66,7 @@ pub fn init(mut commands: Commands) {
                                 PickingInteraction::None,
                                 InterpolateTransform::ExponentialDecay(5.),
                             ))
-                            .observe(|trigger: On<Pointer<Press>>, mut commands: Commands| {
+                            .observe(|trigger: On<PointerPress>, mut commands: Commands| {
                                 println!("Entity {:?} goes BOOM!", trigger.event().entity);
                                 commands.entity(trigger.event().entity).despawn();
                             });
