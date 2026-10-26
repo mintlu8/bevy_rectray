@@ -349,7 +349,8 @@ pub fn mark_dirty_on(
     let container_changed = container
         .is_some_and(|x| x.is_changed() || children_component_changed || any_children_changed);
 
-    let changed = transform.is_changed()
+    let changed = parent_is_dirty
+        || transform.is_changed()
         || dimension.is_changed()
         || oofb.is_changed()
         || oofb_dirty

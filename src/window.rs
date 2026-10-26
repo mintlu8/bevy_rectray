@@ -35,11 +35,15 @@ pub fn window_frame_system(
     };
     let size = window.size();
     for mut frame in &mut frames {
-        frame.dimension = size;
+        if frame.dimension != size {
+            frame.dimension = size;
+        }
     }
     if let Some(pos) = window.cursor_position() {
         for mut transform in &mut cursors {
-            transform.offset = (pos - size / 2.) * Vec2::new(1., -1.);
+            if transform.offset != (pos - size / 2.) * Vec2::new(1., -1.) {
+                transform.offset = (pos - size / 2.) * Vec2::new(1., -1.);
+            }
         }
     }
 }

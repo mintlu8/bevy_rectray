@@ -107,6 +107,7 @@ mod rect;
 mod sync_sprite;
 mod tooltip;
 mod transform;
+mod util;
 #[cfg(feature = "window")]
 mod window;
 
@@ -117,6 +118,7 @@ pub use pipeline::compute_transform_2d;
 pub use rect::{Anchor, RotatedRect};
 pub use tooltip::{AnchorDirection, OutOfFrameBehavior};
 pub use transform::{Dimension, InterpolateTransform, SyncDimension, Transform2D};
+pub use util::{ExchangeBuilder, ExchangeChildrenCommandExt, ExchangeChildrenExt, ExchangeRoot};
 #[cfg(feature = "window")]
 pub use window::{RectrayCursor, RectrayWindow};
 
