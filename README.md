@@ -95,14 +95,6 @@ See module level documentation for details.
 
 ![text](./showcase/text.png)
 
-## Versions
-
-| bevy | bevy_rectray |
-|------|--------------|
-| 0.14 | 0.1          |
-| 0.15 | 0.2          |
-| 0.16 | 0.3-latest   |
-
 ## License
 
 Licensed under either of
