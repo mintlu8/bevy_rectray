@@ -20,7 +20,7 @@ window = ["bevy/bevy_window"]
 a11y = ["window", "dep:accesskit"]
 
 [dependencies]
-bevy = { version = "0.20.0", default-features = false, features = ["bevy_picking", "bevy_camera"]}
+bevy = { version = "0.20.0", default-features = false, features = ["bevy_picking", "bevy_camera", "bevy_log"]}
 downcast-rs = "1.2.1"
 serde = { version = "1.0.204", features = ["derive"] }
 accesskit = { version = "0.24.1", optional = true }
